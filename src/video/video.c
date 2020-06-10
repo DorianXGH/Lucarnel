@@ -114,7 +114,10 @@ void putChar(uint8_t c, uint64_t x, uint64_t y, struct stivale_struct* stivale, 
         for(uint64_t row = y; row < y + 8; row++)
         {
             uint64_t j = row * stivale->framebuffer_pitch;
-            for(uint64_t i = j + x)
+            for(uint64_t i = j + x; i < j + x + 8; i++) 
+            {
+
+            }
         }
     }
 }
