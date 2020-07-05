@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include "includes/stivale.h"
-#include "includes/paging.h"
+#include "includes/memory.h"
+#include "video/video.h"
 
 uint8_t kernel_stack[0x1000] __attribute__((section(".stack"),used)) = {0};
 struct stivale_header stivalehd __attribute__((section(".stivalehdr"),used)) = {
@@ -15,4 +16,13 @@ int main(struct stivale_struct *stivale_info)
     VMEM[1] = 0xFF00FF00;
     VMEM[2] = 0xFF00FF00;
     VMEM[3] = 0xFF00FF00;
+    initCharMap();
+    putChar(' ',20+0*16,20,stivale_info,0xFF000000,0xFF000000,2);
+    putChar(' ',20+1*16,20,stivale_info,0x00FF0000,0x00FF0000,2);
+    putChar(' ',20+2*16,20,stivale_info,0x0000FF00,0x0000FF00,2);
+    putChar(' ',20+3*16,20,stivale_info,0x000000FF,0x000000FF,2);
+    for(char i = 'a'; i <= 'l'; i++)
+    {
+        putChar(i,(i-'a')*24,48,stivale_info,0x00FFFFFF,0x00FF0000,3);
+    }
 }

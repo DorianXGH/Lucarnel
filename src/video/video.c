@@ -91,12 +91,53 @@ uint8_t chars[][8*8] = {
         0,X,0,0,0,0,X,0,
         0,X,0,0,0,0,X,0,
         0,0,0,0,0,0,0,0
-    }
+    },
+    { // I
+        0,0,0,0,0,0,0,0,
+        0,0,X,X,X,X,0,0,
+        0,0,0,X,X,0,0,0,
+        0,0,0,X,X,0,0,0,
+        0,0,0,X,X,0,0,0,
+        0,0,0,X,X,0,0,0,
+        0,0,X,X,X,X,0,0,
+        0,0,0,0,0,0,0,0
+    },
+    { // J
+        0,0,0,0,0,0,0,0,
+        0,0,0,X,X,X,0,0,
+        0,0,0,0,X,0,0,0,
+        0,0,0,0,X,0,0,0,
+        0,0,0,0,X,0,0,0,
+        0,0,0,0,X,0,0,0,
+        0,0,X,X,0,0,0,0,
+        0,0,0,0,0,0,0,0
+    },
+    { // K
+        0,0,0,0,0,0,0,0,
+        0,X,0,0,0,0,X,0,
+        0,X,0,0,0,X,0,0,
+        0,X,X,X,X,0,0,0,
+        0,X,0,0,0,X,0,0,
+        0,X,0,0,0,0,X,0,
+        0,X,0,0,0,0,X,0,
+        0,0,0,0,0,0,0,0
+    },
+    { // L
+        0,0,0,0,0,0,0,0,
+        0,X,0,0,0,0,0,0,
+        0,X,0,0,0,0,0,0,
+        0,X,0,0,0,0,0,0,
+        0,X,0,0,0,0,0,0,
+        0,X,0,0,0,0,0,0,
+        0,X,X,X,X,X,X,0,
+        0,0,0,0,0,0,0,0
+    },
 };
 char charmap[256];
 
 void initCharMap()
 {
+    charmap[' '] = 0;
     charmap['a'] = 1;
     charmap['b'] = 2;
     charmap['c'] = 3;
@@ -105,18 +146,24 @@ void initCharMap()
     charmap['f'] = 6;
     charmap['g'] = 7;
     charmap['h'] = 8;
+    charmap['i'] = 9;
+    charmap['j'] = 10;
+    charmap['k'] = 11;
+    charmap['l'] = 12;
 }
 
-void putChar(uint8_t c, uint64_t x, uint64_t y, struct stivale_struct* stivale, uint32_t foreground, uint32_t background)
+void putChar(uint8_t c, uint64_t x, uint64_t y, struct stivale_struct* stivale, uint32_t foreground, uint32_t background, uint8_t zoomfactor)
 {
-    if(x + 8 < stivale->framebuffer_width && y + 8 < stivale->framebuffer_height)
+    if(x + zoomfactor * 8 < stivale->framebuffer_width && y + zoomfactor * 8 < stivale->framebuffer_height)
     {
-        for(uint64_t row = y; row < y + 8; row++)
+        for(uint64_t row = 0; row < zoomfactor * 8; row++)
         {
-            uint64_t j = row * stivale->framebuffer_pitch;
-            for(uint64_t i = j + x; i < j + x + 8; i++) 
+            uint64_t j = (row + y) * stivale->framebuffer_pitch + stivale->framebuffer_addr;
+            for(uint64_t i = 0; i < zoomfactor * 8; i++) 
             {
-
+                uint32_t* pix = (uintptr_t) (j+4*(x+i));
+                uint8_t onoff = chars[charmap[c]][(row/zoomfactor) * 8 + (i/zoomfactor)];
+                *pix =  onoff * foreground + (1 - onoff) * background;
             }
         }
     }
