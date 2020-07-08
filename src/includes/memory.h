@@ -18,10 +18,31 @@ struct GDTE {
     uint8_t ring: 2;
     uint8_t present: 1;
     uint8_t limit2: 4;
-    uint8_t nullbits: 2;
+    uint8_t nullbits: 1;
+    uint8_t longmode: 1;
     uint8_t size: 1;
     uint8_t granularity: 1;
     uint8_t base3: 8;
+} __attribute__((packed)) ;
+
+
+struct GDTE_TSS {
+    uint16_t limit1;
+    uint16_t base1;
+    uint8_t base2;
+    uint8_t accessed: 1;
+    uint8_t read_write: 1;
+    uint8_t dir_conforming: 1;
+    uint8_t code: 1;
+    uint8_t descriptor: 1;
+    uint8_t ring: 2;
+    uint8_t present: 1;
+    uint8_t limit2: 4;
+    uint8_t nullbits: 3;
+    uint8_t granularity: 1;
+    uint8_t base3: 8;
+    uint32_t base4;
+    uint32_t reserved;
 } __attribute__((packed)) ;
 
 struct CR3 {
