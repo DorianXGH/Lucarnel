@@ -8,10 +8,12 @@ _lgdt:
     lgdt [rdi]
     ; Reload CS register containing code selector:
     mov   rax, rsp
-    push  ss
+    xor   rdi, rdi
+    mov   di, ss
+    push qword rdi
     push  rax
     pushfq
-    push  0x08
+    push qword 0x08
     push _reload_cs
     iretq
 _reload_cs:
