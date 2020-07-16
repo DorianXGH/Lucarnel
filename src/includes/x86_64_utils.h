@@ -1,4 +1,4 @@
 #pragma once
-#include "memory.h"
+#include "memory_structs.h"
 
 void _lgdt(struct GDTD *);
