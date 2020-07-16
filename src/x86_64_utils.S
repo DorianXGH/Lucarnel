@@ -6,11 +6,16 @@ global _lidt
 
 _lgdt:
     lgdt [rdi]
-.reloadSegments:
-   ; Reload CS register containing code selector:
-    jmp   0x08:reload_CS ; 0x08 points at the new code selector
-.reload_CS:
-   ; Reload data segment registers:
+    ; Reload CS register containing code selector:
+    mov   rax, rsp
+    push  ss
+    push  rax
+    pushfq
+    push  0x08
+    push _reload_cs
+    iretq
+_reload_cs:
+    ; Reload data segment registers:
     mov   ax, 0x10 ; 0x10 points at the new data selector
     mov   ds, ax
     mov   es, ax
