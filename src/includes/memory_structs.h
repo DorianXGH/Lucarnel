@@ -1,10 +1,12 @@
 #pragma once
 #include <stdint.h>
+#include "assert.h"
 
 struct GDTD {
     uint16_t size;
     uint64_t offset;
 } __attribute__((packed)) ; 
+STATIC_ASSERT(sizeof(struct GDTD) == 10, wrong_GDTD_size);
 
 struct GDTE {
     uint16_t limit1;
@@ -24,6 +26,7 @@ struct GDTE {
     uint8_t granularity: 1;
     uint8_t base3: 8;
 } __attribute__((packed)) ;
+STATIC_ASSERT(sizeof(struct GDTE) == 8, wrong_GDTE_size);
 
 
 struct GDTE_TSS {
@@ -44,12 +47,14 @@ struct GDTE_TSS {
     uint32_t base4;
     uint32_t reserved;
 } __attribute__((packed)) ;
+STATIC_ASSERT(sizeof(struct GDTE_TSS) == 16, wrong_GDTE_TSS_size);
 
 struct CR3 {
     uint16_t PCID: 12;
     uint64_t address: 42;
     uint16_t nullbits: 10;
 } __attribute__((packed)) ;
+STATIC_ASSERT(sizeof(struct CR3) == 8, wrong_CR3_size);
 
 struct PML4E {
     uint8_t present: 1;
@@ -64,6 +69,7 @@ struct PML4E {
     uint16_t nullbits: 9;
     uint8_t execution_disabled: 1;
 } __attribute__((packed)) ;
+STATIC_ASSERT(sizeof(struct PML4E) == 8, wrong_PML4E_size);
 
 struct PDPTE {
     uint8_t present: 1;
@@ -78,6 +84,7 @@ struct PDPTE {
     uint16_t nullbits: 9;
     uint8_t execution_disabled: 1;
 } __attribute__((packed)) ;
+STATIC_ASSERT(sizeof(struct PDPTE) == 8, wrong_PDPTE_size);
 
 struct PDE {
     uint8_t present: 1;
@@ -92,6 +99,7 @@ struct PDE {
     uint16_t nullbits: 9;
     uint8_t execution_disabled: 1;
 } __attribute__((packed)) ;
+STATIC_ASSERT(sizeof(struct PDE) == 8, wrong_PDE_size);
 
 struct PTE {
     uint8_t present: 1;
@@ -107,3 +115,4 @@ struct PTE {
     uint16_t nullbits: 9;
     uint8_t execution_disabled: 1;
 } __attribute__((packed)) ;
+STATIC_ASSERT(sizeof(struct PTE) == 8, wrong_PTE_size);

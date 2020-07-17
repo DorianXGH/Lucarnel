@@ -34,7 +34,7 @@ struct GDTE gdt[] = {
         0xF, // limit2
         0, // nullbits
         1, // longmode
-        1, // 32 bit protected
+        0, // 32 bit protected
         1, // limit using pages
         0  // base 3
     },
@@ -51,7 +51,7 @@ struct GDTE gdt[] = {
         1, // present
         0xF, // limit2
         0, // nullbits
-        1, // longmode
+        0, // longmode
         1, // 32 bit protected
         1, // limit using pages
         0  // base 3
@@ -70,7 +70,7 @@ struct GDTE gdt[] = {
         0xF, // limit2
         0, // nullbits
         1, // longmode
-        1, // 32 bit protected
+        0, // 32 bit protected
         1, // limit using pages
         0  // base 3
     },
@@ -87,7 +87,7 @@ struct GDTE gdt[] = {
         1, // present
         0xF, // limit2
         0, // nullbits
-        1, // longmode
+        0, // longmode
         1, // 32 bit protected
         1, // limit using pages
         0  // base 3
@@ -148,8 +148,6 @@ struct GDTE_TSS gdte_tss = {
         1, // present
         0xF, // limit2
         0, // nullbits
-        1, // longmode
-        0, // 32 bit protected
         0, // limit using pages
         0, // base 3
         0, // base 4
