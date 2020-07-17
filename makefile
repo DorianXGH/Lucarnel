@@ -1,6 +1,6 @@
 GCC_ASM_ARGS:= -masm=intel
 GAS_ASM_ARGS:= -msyntax=intel -mnaked-reg
-GCC_TARGET_ARGS:= -ffreestanding -mno-red-zone 
+GCC_TARGET_ARGS:= -ffreestanding -mno-red-zone -std=c11
 GCC_TOOLS_PREFIX:= /home/dorian/opt/cross/bin/x86_64-elf-
 
 

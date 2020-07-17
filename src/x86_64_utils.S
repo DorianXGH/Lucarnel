@@ -7,15 +7,13 @@ global _lidt
 _lgdt:
     lgdt [rdi]
     ; Reload CS register containing code selector:
-    mov   rax, rsp
-    xor   rdi, rdi
-    mov   di, ss
-    push qword rdi
-    push  rax
-    pushfq
-    push qword 0x08
-    push _reload_cs
-    iretq
+    mov rax, rsp
+	push qword 0x10
+	push qword rax
+	pushf
+	push qword 0x08
+	push qword _reload_cs
+	iretq
 _reload_cs:
     ; Reload data segment registers:
     mov   ax, 0x10 ; 0x10 points at the new data selector
