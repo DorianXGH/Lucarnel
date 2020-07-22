@@ -78,7 +78,7 @@ struct PDPTE {
     uint8_t write_through: 1;
     uint8_t cache_disabled: 1;
     uint8_t accessed: 1;
-    uint8_t dirty: 1;
+    uint8_t dirty: 1; // only if following bit is 1
     uint8_t page1G: 1;
     uint8_t nullbits_flg: 4;
     uint64_t address: 42;
@@ -94,9 +94,9 @@ struct PDE {
     uint8_t write_through: 1;
     uint8_t cache_disabled: 1;
     uint8_t accessed: 1;
-    uint8_t dirty: 1;
+    uint8_t dirty: 1; // only if following bit is 1
     uint8_t page2M: 1;
-    uint8_t nullbits_flg: 5;
+    uint8_t nullbits_flg: 4;
     uint64_t address: 42;
     uint16_t nullbits: 9;
     uint8_t execution_disabled: 1;
