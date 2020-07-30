@@ -30,5 +30,6 @@ _lidt:
     ret
 
 _lcr3:
-    mov cr3, [rdi]
+    mov rax, [rdi]
+    mov cr3, rax
     ret
