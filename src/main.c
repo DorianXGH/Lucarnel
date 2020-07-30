@@ -24,18 +24,17 @@ int main(struct stivale_struct *stivale_info)
     putChar(' ',20+1*16,20,stivale_info,0x00FF0000,0x00FF0000,2);
     putChar(' ',20+2*16,20,stivale_info,0x0000FF00,0x0000FF00,2);
     putChar(' ',20+3*16,20,stivale_info,0x000000FF,0x000000FF,2);
-    for(char i = 'a'; i <= 'l'; i++)
+    for(char i = 'a'; i <= 'z'; i++)
     {
-        putChar(i,(i-'a')*24,256,stivale_info,0x00FFFFFF,0x00FF0000,3);
+        putChar(i,(i-'a')*16,256,stivale_info,0x00FFFFFF,0x00FF0000,2);
     }
     _lgdt(&gdtd);
-    putChar(' ',20+0*16,64,stivale_info,0xFF000000,0xFF000000,2);
-    putChar(' ',20+1*16,64,stivale_info,0x00FF0000,0x00FF0000,2);
-    putChar(' ',20+2*16,64,stivale_info,0x0000FF00,0x0000FF00,2);
-    putChar(' ',20+3*16,64,stivale_info,0x000000FF,0x000000FF,2);
+    putChar('g',20+0*16,64,stivale_info,0x00FF00FF,0x00000000,2);
+    putChar('d',20+1*16,64,stivale_info,0x00FF00FF,0x00000000,2);
+    putChar('t',20+2*16,64,stivale_info,0x00FF00FF,0x00000000,2);
     paging_init_identity();
-    putChar('a',20+0*16,128,stivale_info,0xFF000000,0xFF000000,2);
-    putChar('g',20+1*16,128,stivale_info,0x00FF0000,0x00FF0000,2);
-    putChar('i',20+2*16,128,stivale_info,0x0000FF00,0x0000FF00,2);
-    putChar('g',20+3*16,128,stivale_info,0x000000FF,0x000000FF,2);
+    putChar('p',20+0*16,128,stivale_info,0x00FF00FF,0xFF000000,2);
+    putChar('a',20+1*16,128,stivale_info,0x00FF00FF,0x00FF0000,2);
+    putChar('g',20+2*16,128,stivale_info,0x00FF00FF,0x0000FF00,2);
+    putChar('i',20+3*16,128,stivale_info,0x00FF00FF,0x000000FF,2);
 }
