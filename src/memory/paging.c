@@ -48,4 +48,10 @@ void paging_init_identity()
             0  // allow execution
         };
     }
+    struct CR3 cr3 = {
+        0, // PCID or flags
+        (uintptr_t)pml4 >> 12,
+        0 // nullbits
+    };
+    _lcr3(&cr3);
 }

@@ -3,6 +3,7 @@ BITS 64
 section .text
 global _lgdt
 global _lidt
+global _lcr3
 
 _lgdt:
     lgdt [rdi]
@@ -26,4 +27,8 @@ _reload_cs:
 
 _lidt:
     lidt [rdi]
+    ret
+
+_lcr3:
+    mov cr3, [rdi]
     ret
