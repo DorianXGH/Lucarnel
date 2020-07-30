@@ -169,10 +169,10 @@ void putChar(uint8_t c, uint64_t x, uint64_t y, struct stivale_struct *stivale, 
 {
     if (x + zoomfactor * 8 < stivale->framebuffer_width && y + zoomfactor * 8 < stivale->framebuffer_height)
     {
-        for (uint64_t row = 0; row < zoomfactor * 8; row++)
+        for (uint64_t row = 0; row < zoomfactor * 10; row++)
         {
             uint64_t j = (row + y) * stivale->framebuffer_pitch + stivale->framebuffer_addr;
-            for (uint64_t i = 0; i < zoomfactor * 10; i++)
+            for (uint64_t i = 0; i < zoomfactor * 8; i++)
             {
                 uint32_t *pix = (uintptr_t)(j + 4 * (x + i));
                 uint8_t onoff = chars[charmap[c]][(row / zoomfactor) * 8 + (i / zoomfactor)];

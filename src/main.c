@@ -26,7 +26,7 @@ int main(struct stivale_struct *stivale_info)
     putChar(' ',20+3*16,20,stivale_info,0x000000FF,0x000000FF,2);
     for(char i = 'a'; i <= 'l'; i++)
     {
-        putChar(i,(i-'a')*24,48,stivale_info,0x00FFFFFF,0x00FF0000,3);
+        putChar(i,(i-'a')*24,256,stivale_info,0x00FFFFFF,0x00FF0000,3);
     }
     _lgdt(&gdtd);
     putChar(' ',20+0*16,64,stivale_info,0xFF000000,0xFF000000,2);
