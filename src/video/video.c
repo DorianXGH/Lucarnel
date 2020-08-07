@@ -355,7 +355,7 @@ void putString(uint8_t* s, uint64_t x, uint64_t y, struct stivale_struct *stival
 {
     for(int i = 0; s[i] != 0; i++)
     {
-        int effy = (y+(8*zoomfactor*i));
-        putChar(s[i],x+(10*zoomfactor*(effy/(stivale->framebuffer_width))),effy%(stivale->framebuffer_width),stivale,foreground,background,zoomfactor);
+        int effx = (x+(8*zoomfactor*i));
+        putChar(s[i],effx%(stivale->framebuffer_width),y+(10*zoomfactor*(effx/(stivale->framebuffer_width))),stivale,foreground,background,zoomfactor);
     }
 }
