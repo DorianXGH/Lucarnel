@@ -30,3 +30,9 @@ STATIC_ASSERT(sizeof(struct IFrame) == 40, wrong_interrupt_frame_size);
 
 __attribute__((interrupt)) void ISR_general_handler(struct IFrame* interrupt_frame);
 __attribute__((interrupt)) void ISR_error_handler(struct IFrame* interrupt_frame, uint64_t error_code);
+
+__attribute__((interrupt)) void ISR_div_by_zero_handler(struct IFrame* interrupt_frame);
+__attribute__((interrupt)) void ISR_debug_handler(struct IFrame* interrupt_frame);
+__attribute__((interrupt)) void ISR_NMI_handler(struct IFrame* interrupt_frame);
+
+void init_IDT();
