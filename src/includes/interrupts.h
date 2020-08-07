@@ -19,14 +19,14 @@ struct IDTE {
 } __attribute__((packed));
 STATIC_ASSERT(sizeof(struct IDTE) == 16, wrong_IDTE_size);
 
-struct IF {
+struct IFrame {
     uint64_t SS;
     uint64_t RSP;
     uint64_t RFLAGS;
     uint64_t CS;
     uint64_t RIP;
 } __attribute__((packed));
-STATIC_ASSERT(sizeof(struct IF) == 40, wrong_interrupt_frame_size);
+STATIC_ASSERT(sizeof(struct IFrame) == 40, wrong_interrupt_frame_size);
 
-__attribute__((interrupt)) void ISR_general_handler(struct IF* interrupt_frame);
-__attribute__((interrupt)) void ISR_error_handler(struct IF* interrupt_frame, uint64_t error_code);
+__attribute__((interrupt)) void ISR_general_handler(struct IFrame* interrupt_frame);
+__attribute__((interrupt)) void ISR_error_handler(struct IFrame* interrupt_frame, uint64_t error_code);
