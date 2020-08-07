@@ -12,6 +12,8 @@ struct stivale_header stivalehd __attribute__((section(".stivalehdr"),used)) = {
     .flags = 0x0001
 };
 
+struct stivale_struct stivale_global_info;
+
 int main(struct stivale_struct *stivale_info)
 {
     uint32_t *VMEM = (uint32_t *)(stivale_info->framebuffer_addr);
@@ -32,4 +34,5 @@ int main(struct stivale_struct *stivale_info)
     putString("gdt\0",0,64,stivale_info,0x00FF00FF,0xFF000000,2);
     paging_init_identity();
     putString("paging\0",0,128,stivale_info,0x00FF00FF,0xFF000000,2);
+    stivale_global_info = *stivale_info;
 }

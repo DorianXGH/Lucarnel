@@ -351,11 +351,11 @@ void putChar(uint8_t c, uint64_t x, uint64_t y, struct stivale_struct *stivale, 
     }
 }
 
-void putString(uint8_t* s, uint64_t x, uint64_t y, struct stivale_struct *stivale, uint32_t foreground, uint32_t background, uint8_t zoomfactor)
+void putString(uint8_t *s, uint64_t x, uint64_t y, struct stivale_struct *stivale, uint32_t foreground, uint32_t background, uint8_t zoomfactor)
 {
-    for(int i = 0; s[i] != 0; i++)
+    for (int i = 0; s[i] != 0; i++)
     {
-        int effx = (x+(8*zoomfactor*i));
-        putChar(s[i],effx%(stivale->framebuffer_width),y+(10*zoomfactor*(effx/(stivale->framebuffer_width))),stivale,foreground,background,zoomfactor);
+        int effx = (x + (8 * zoomfactor * i));
+        putChar(s[i], effx % (stivale->framebuffer_width), y + (10 * zoomfactor * (effx / (stivale->framebuffer_width))), stivale, foreground, background, zoomfactor);
     }
 }

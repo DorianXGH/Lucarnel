@@ -1,7 +1,12 @@
 #include "../includes/interrupts.h"
-__attribute__((interrupt)) void ISR_general_handler(struct IFrame* interrupt_frame) {
+#include "../includes/stivale.h"
+#include "../video/video.h"
 
+extern struct stivale_struct stivale_global_info;
+
+__attribute__((interrupt)) void ISR_general_handler(struct IFrame* interrupt_frame) {
+    putString("isr",0,0,&stivale_global_info,0xFFFFFFFF,0xFFFF0000,1);
 }
 __attribute__((interrupt)) void ISR_error_handler(struct IFrame* interrupt_frame, uint64_t error_code) {
-
+    putString("isrerr",0,0,&stivale_global_info,0xFFFFFFFF,0xFFFF0000,1);
 }
