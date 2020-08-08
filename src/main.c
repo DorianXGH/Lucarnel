@@ -42,7 +42,13 @@ int main(struct stivale_struct *stivale_info)
     init_IDT();
     putString("idt\0",0,128+64,stivale_info,0x00FF00FF,0xFF000000,2);
 
+    putString("0x0123456789abcdef",200,40,stivale_info,0xFF00FF00,0x00000000,1);
+
+    uint8_t testitohex[19];
+    itohex(0x0123456789ABCDEF,testitohex);
+    putString(testitohex,200,20,stivale_info,0xFF000000,0x00FFFFFF,1);
+
     uint8_t rsdpaddr[19];
     itohex(stivale_info->rsdp,rsdpaddr);
-    putString(rsdpaddr,200,0,stivale_info,0xFF00FF00,0x00000000,1);
+    putString(rsdpaddr,200,0,stivale_info,0xFF000000,0x00FFFFFF,1);
 }

@@ -7,7 +7,7 @@ void itohex(uint64_t num, uint8_t buffer[19])
     buffer[1] = 'x';
     for(int i = 0; i < 16; i++)
     {
-        buffer[18-i] = digits[(num>>(4*i))&0xF];
+        buffer[17-i] = digits[(num>>(4*i))&0xF];
     }
-    buffer[19] = 0;
+    buffer[18] = 0;
 }
