@@ -6,6 +6,7 @@
 #include "includes/x86_64_utils.h"
 #include "memory/paging.h"
 #include "includes/interrupts.h"
+#include "includes/utils.h"
 
 uint8_t kernel_stack[0x1000] __attribute__((section(".stack"),used)) = {0};
 struct stivale_header stivalehd __attribute__((section(".stivalehdr"),used)) = {
@@ -40,4 +41,8 @@ int main(struct stivale_struct *stivale_info)
 
     init_IDT();
     putString("idt\0",0,128+64,stivale_info,0x00FF00FF,0xFF000000,2);
+
+    uint8_t rsdpaddr[19];
+    itohex(stivale_info->rsdp,rsdpaddr);
+    putString(rsdpaddr,200,0,stivale_info,0xFF00FF00,0x00000000,1);
 }
