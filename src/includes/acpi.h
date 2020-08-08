@@ -10,7 +10,7 @@ struct RSDP {
 } __attribute__((packed));
 
 struct RSDP2 {
-    RSDP header;
+    struct RSDP header;
     uint32_t length;
     uint64_t xsdt_address;
     uint8_t extended_checksum;

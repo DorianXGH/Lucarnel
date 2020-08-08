@@ -7,6 +7,7 @@
 #include "memory/paging.h"
 #include "includes/interrupts.h"
 #include "includes/utils.h"
+#include "includes/acpi.h"
 
 uint8_t kernel_stack[0x1000] __attribute__((section(".stack"),used)) = {0};
 struct stivale_header stivalehd __attribute__((section(".stivalehdr"),used)) = {
@@ -42,13 +43,24 @@ int main(struct stivale_struct *stivale_info)
     init_IDT();
     putString("idt\0",0,128+64,stivale_info,0x00FF00FF,0xFF000000,2);
 
-    putString("0x0123456789abcdef",200,40,stivale_info,0xFF00FF00,0x00000000,1);
-
-    uint8_t testitohex[19];
-    itohex(0x0123456789ABCDEF,testitohex);
-    putString(testitohex,200,20,stivale_info,0xFF000000,0x00FFFFFF,1);
-
     uint8_t rsdpaddr[19];
     itohex(stivale_info->rsdp,rsdpaddr);
     putString(rsdpaddr,200,0,stivale_info,0xFF000000,0x00FFFFFF,1);
+
+    struct RSDP2* rsdp = (struct RSDP2*)(stivale_info->rsdp);
+
+    if(rsdp->header.revision != 2)
+    {
+        putString("ACPI 2 or more needed\0",0,10,stivale_info,0xFFFFFFFF,0x00FF0000,1);
+    }
+
+    if(rsdp->header.signature != 2)
+    {
+        putString("ACPI 2 or more needed\0",0,10,stivale_info,0xFFFFFFFF,0x00FF0000,1);
+    }
+
+    uint8_t xsdtaddr[19];
+    itohex(rsdp->xsdt_address,xsdtaddr);
+    putString(xsdtaddr,0,20,stivale_info,0xFF000000,0x00FFFFFF,1);
+
 }
