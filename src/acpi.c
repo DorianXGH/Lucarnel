@@ -19,12 +19,6 @@ bool do_checksum(struct ACPISDTHeader* table_header)
 
 void init_kernel_acpi(struct RSDP2* rsdp)
 {
-    uint8_t rsdpaddr[19];
-    itohex(stivale_global_info.rsdp,rsdpaddr);
-    putString(rsdpaddr,200,0,&stivale_global_info,0xFF000000,0x00FFFFFF,1);
-
-    struct RSDP2* rsdp = (struct RSDP2*)(stivale_global_info.rsdp);
-
     if(rsdp->header.revision != 2)
     {
         putString("ACPI 2 or more needed\0",0,10,&stivale_global_info,0xFFFFFFFF,0x00FF0000,1);
