@@ -14,6 +14,9 @@ build/video.o: src/video/video.c
 build/paging.o: src/memory/paging.c
 	$(GCC_TOOLS_PREFIX)gcc -o $@ -c $< $(GCC_TARGET_ARGS) $(GCC_ASM_ARGS)
 
+build/utils.o: src/utils.c
+	$(GCC_TOOLS_PREFIX)gcc -o $@ -c $< $(GCC_TARGET_ARGS) $(GCC_ASM_ARGS)
+
 build/ISR.o: src/interrupts/ISR.c
 	$(GCC_TOOLS_PREFIX)gcc -o $@ -c $< $(GCC_TARGET_ARGS) $(GCC_ASM_ARGS) $(GGC_INTERRUPT_ARGS)
 
@@ -26,7 +29,7 @@ build/entry.o: src/entry.S
 build/x86_64_utils.o: src/x86_64_utils.S
 	nasm $< -o $@ -f elf64
 
-build/kernel.elf: build/main.o build/entry.o build/video.o build/x86_64_utils.o build/paging.o build/ISR.o build/IDT.o
+build/kernel.elf: build/main.o build/entry.o build/video.o build/x86_64_utils.o build/paging.o build/ISR.o build/IDT.o build/utils.o
 	$(GCC_TOOLS_PREFIX)ld -m elf_x86_64 -T src/link.ld $^ -o $@
 
 clean:
