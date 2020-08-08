@@ -13,17 +13,17 @@ struct RSDP
 
 struct RSDP2
 {
-    struct RSDP header;
+    struct RSDP header; // first part of RSDP
     uint32_t length;
-    uint64_t xsdt_address;
+    uint64_t xsdt_address; // address of XSDT
     uint8_t extended_checksum;
     uint8_t reserved[3];
 } __attribute__((packed));
 
 struct ACPISDTHeader
 {
-    uint8_t signature[4];
-    uint32_t length;
+    uint8_t signature[4]; // signature of the table
+    uint32_t length; // length of the table
     uint8_t revision;
     uint8_t checksum;
     uint8_t OEMID[6];
@@ -33,4 +33,5 @@ struct ACPISDTHeader
     uint32_t creator_revision;
 } __attribute__((packed));
 
-bool do_checksum(struct ACPISDTHeader *table_header);
+bool acpi_do_checksum(struct ACPISDTHeader *table_header);
+void init_kernel_acpi(struct RSDP2* rsdp);

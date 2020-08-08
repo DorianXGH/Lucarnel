@@ -43,24 +43,6 @@ int main(struct stivale_struct *stivale_info)
     init_IDT();
     putString("idt\0",0,128+64,stivale_info,0x00FF00FF,0xFF000000,2);
 
-    uint8_t rsdpaddr[19];
-    itohex(stivale_info->rsdp,rsdpaddr);
-    putString(rsdpaddr,200,0,stivale_info,0xFF000000,0x00FFFFFF,1);
-
-    struct RSDP2* rsdp = (struct RSDP2*)(stivale_info->rsdp);
-
-    if(rsdp->header.revision != 2)
-    {
-        putString("ACPI 2 or more needed\0",0,10,stivale_info,0xFFFFFFFF,0x00FF0000,1);
-    }
-
-    if(arrcmp(rsdp->header.signature,"RSD PTR ",8))
-    {
-        putString("RSDP Valid\0",0,20,stivale_info,0xFFFFFFFF,0x00FF0000,1);
-    }
-
-    uint8_t xsdtaddr[19];
-    itohex(rsdp->xsdt_address,xsdtaddr);
-    putString(xsdtaddr,0,30,stivale_info,0xFF000000,0x00FFFFFF,1);
+    init_kernel_acpi(stivale_info->rsdp);
 
 }
