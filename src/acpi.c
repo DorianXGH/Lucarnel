@@ -82,7 +82,7 @@ void init_kernel_acpi(struct RSDP2* rsdp)
 void parse_madt()
 {
     uintptr_t max = madt + (madt->length);
-    uintptr_t current = madt + sizeof(struct ACPISDTHeader);
+    uintptr_t current = (uintptr_t)madt + sizeof(struct ACPISDTHeader);
     struct MADTLocal_APIC* lapic = current;
     uint8_t addrapic[19];
     itohex(lapic->address,addrapic);
