@@ -91,4 +91,23 @@ void parse_madt()
     uint8_t flagsapic[19];
     itohex(lapic->flags,flagsapic);
     putString(flagsapic,8*20,210,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
+    current += sizeof(struct MADTLocal_APIC);
+    for(int i = 0; current < max; current += ((struct MADTEntry_header*)(current))->length) // for each entry
+    {
+        struct MADTEntry_header* entry = ((struct MADTEntry_header*)(current));
+        if(entry->entry_type == 0)
+        {
+            struct LAPIC* apic = (struct LAPIC*)entry;
+            uint8_t procid[19];
+            itohex(apic->processorID,procid);
+            uint8_t apicid[19];
+            itohex(apic->LAPIC_ID,apicid);
+            uint8_t flags[19];
+            itohex(apic->flags,flags);
+            putString(procid,0,220+10*i,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
+            putString(apicid,8*20,220+10*i,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
+            putString(flags,8*40,220+10*i,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
+        }
+        i++;
+    }
 }
