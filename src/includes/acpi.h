@@ -33,5 +33,35 @@ struct ACPISDTHeader
     uint32_t creator_revision;
 } __attribute__((packed));
 
+struct MADTEntry_header 
+{
+    uint8_t entry_type;
+    uint8_t length;
+} __attribute__((packed));
+
+struct MADTLocal_APIC
+{
+    uint32_t address; // address of the LAPIC MMIO registers
+    uint32_t flags;
+} __attribute__((packed));
+
+struct LAPIC
+{
+    struct MADTEntry_header header;
+    uint8_t processorID;
+    uint8_t LAPIC_ID;
+    uint32_t flags;
+} __attribute__((packed));
+
+struct IOAPIC
+{
+    struct MADTEntry_header header;
+    uint8_t IOAPIC_ID;
+    uint8_t reserved;
+    uint32_t address; // address of the IOAPIC MMIO registers
+    uint32_t GSI_base; // global system interrupt base (ie, the lowest handled interrupt of the IOAPIC)
+} __attribute__((packed));
+
 bool acpi_do_checksum(struct ACPISDTHeader *table_header);
 void init_kernel_acpi(struct RSDP2* rsdp);
+void parse_madt();
