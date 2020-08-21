@@ -44,3 +44,10 @@ struct APICConfig
 
 };
 STATIC_ASSERT(sizeof(struct APICConfig) == 0x400, wrong_APIC_config_size);
+
+
+void init_lapic(struct APICConfig* apicconf);
+/*
+void send_INIT_IPI(struct APICConfig* apicconf);
+void send_STARTUP_IPI(struct APICConfig* apicconf,uint8_t pagenum);
+*/

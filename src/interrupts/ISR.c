@@ -70,3 +70,7 @@ __attribute__((interrupt)) void ISR_general_protection_fault_handler(struct IFra
 __attribute__((interrupt)) void ISR_page_fault_handler(struct IFrame* interrupt_frame, uint64_t error_code) {
     putString("pagefault",0,0,&stivale_global_info,0xFFFFFFFF,0xFFFF0000,1);
 }
+
+__attribute__((interrupt)) void ISR_spurious(struct IFrame* interrupt_frame) {
+    putString("spurious",0,0,&stivale_global_info,0xFFFFFFFF,0xFFFF0000,1);
+}

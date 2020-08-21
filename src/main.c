@@ -46,7 +46,10 @@ int main(struct stivale_struct *stivale_info)
     putString("idt\0",0,128+64,stivale_info,0x00FF00FF,0xFF000000,2);
 
     init_kernel_acpi(stivale_info->rsdp);
+
+    putString("parsed\0",300,0,&stivale_global_info,0x00FF00FF,0xFF000000,2);
     smp_bootstrap_install();
+    putString("btstrp\0",300,0,&stivale_global_info,0x00FF00FF,0xFF000000,2);
     init_system();
 }
 

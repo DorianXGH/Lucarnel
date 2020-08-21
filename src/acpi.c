@@ -2,6 +2,7 @@
 #include "includes/stivale.h"
 #include "video/video.h"
 #include "includes/utils.h"
+#include "includes/apic.h"
 
 extern struct stivale_struct stivale_global_info;
 
@@ -92,7 +93,11 @@ void parse_madt()
     itohex(lapic->flags,flagsapic);
     putString(flagsapic,8*20,210,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
     current += sizeof(struct MADTLocal_APIC);
-    for(int i = 0; current < max; current += ((struct MADTEntry_header*)(current))->length) // for each entry
+
+    struct APICConfig* local_apic_config = lapic->address;
+    init_lapic(local_apic_config);
+    int i = 0;
+    while (current < max) // for each entry
     {
         struct MADTEntry_header* entry = ((struct MADTEntry_header*)(current));
         if(entry->entry_type == 0)
@@ -109,5 +114,19 @@ void parse_madt()
             putString(flags,8*40,220+10*i,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
         }
         i++;
+        if(entry->length == 0)
+        {
+            break;
+        }
+        current += entry->length;
+
+        putString("acpi\0",300,0,&stivale_global_info,0x00FF0000,0xFF000000,1);
+        uint8_t acpientryparsed[19];
+        itohex(i,acpientryparsed);
+        putString(acpientryparsed,350,0,&stivale_global_info,0x00FF0000,0xFF000000,1);
+        itohex(current,acpientryparsed);
+        putString(acpientryparsed,350,10,&stivale_global_info,0x00FF0000,0xFF000000,1);
+        itohex(max,acpientryparsed);
+        putString(acpientryparsed,350,20,&stivale_global_info,0x00FF0000,0xFF000000,1);
     }
 }

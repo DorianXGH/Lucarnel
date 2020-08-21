@@ -1,7 +1,7 @@
 #include "../includes/interrupts.h"
 #include "../includes/x86_64_utils.h"
 #include <stdint.h>
-#define IDT_SIZE 15
+#define IDT_SIZE 256
 
 struct IDTE IDT[256];
 struct IDTD idtd;
@@ -36,6 +36,11 @@ void init_IDT()
     IDT[12] = gen_IDT_entry((uintptr_t)ISR_stack_segment_fault_handler);
     IDT[13] = gen_IDT_entry((uintptr_t)ISR_general_protection_fault_handler);
     IDT[14] = gen_IDT_entry((uintptr_t)ISR_page_fault_handler);
+    for(int i = 15; i < 255; i++)
+    {
+        IDT[i] = gen_IDT_entry((uintptr_t)ISR_spurious);
+    }
+    IDT[255] = gen_IDT_entry((uintptr_t)ISR_spurious);
     idtd = (struct IDTD) {
         (IDT_SIZE*16)-1,
         &IDT

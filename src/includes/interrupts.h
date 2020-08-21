@@ -46,5 +46,6 @@ __attribute__((interrupt)) void ISR_segment_not_present_handler(struct IFrame* i
 __attribute__((interrupt)) void ISR_stack_segment_fault_handler(struct IFrame* interrupt_frame, uint64_t error_code);
 __attribute__((interrupt)) void ISR_general_protection_fault_handler(struct IFrame* interrupt_frame, uint64_t error_code);
 __attribute__((interrupt)) void ISR_page_fault_handler(struct IFrame* interrupt_frame, uint64_t error_code);
+__attribute__((interrupt)) void ISR_spurious(struct IFrame* interrupt_frame);
 
 void init_IDT();
