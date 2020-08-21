@@ -38,4 +38,10 @@ _STACK_START_ = .;
     *(.stack)
 _STACK_END_ = .;
   } :main
+
+  .smp_btstrp : ALIGN(0x1000) {
+_SMP_START_ = .;
+    *(.smp_btstrp)
+_SMP_END_ = .;
+  } :main
 }

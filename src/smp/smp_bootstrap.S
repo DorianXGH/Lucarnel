@@ -1,5 +1,7 @@
 ; Stolen shamelessly from OSdev.org
 
+
+
 %define PAGE_PRESENT    (1 << 0)
 %define PAGE_WRITE      (1 << 1)
  
@@ -10,7 +12,7 @@
 
 %define smp_long_bootstrap 0x00200000
 
-ORG 0x8000
+
  
 ; Function to switch directly to long mode from real mode.
 ; Identity maps the first 2MiB.
@@ -20,9 +22,12 @@ ORG 0x8000
 ; ss:esp    Should point to memory that can be used as a small (1 uint32_t) stack
 
 [BITS 16]
+org 0x8000
+
 Entry:
-    mov ss, 0x0
-    mov es, 0x0
+    mov ax, 0x0
+    mov ss, ax
+    mov es, ax
     mov edi, BUFFER
     mov esp, STACK
  

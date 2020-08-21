@@ -27,13 +27,19 @@ build/ISR.o: src/interrupts/ISR.c
 build/IDT.o: src/interrupts/IDT.c
 	$(GCC_TOOLS_PREFIX)gcc -o $@ -c $< $(GCC_TARGET_ARGS) $(GCC_ASM_ARGS) $(GGC_INTERRUPT_ARGS)
 
+src/smp/smp_bootstrap.bin: src/smp/smp_bootstrap.S
+	nasm $< -o $@ -f bin
+
+build/smp_obj.o: src/smp/smp_obj.S src/smp/smp_bootstrap.bin
+	nasm $< -o $@ -f elf64
+
 build/entry.o: src/entry.S
 	nasm $< -o $@ -f elf64
 
 build/x86_64_utils.o: src/x86_64_utils.S
 	nasm $< -o $@ -f elf64
 
-build/kernel.elf: build/main.o build/entry.o build/video.o build/x86_64_utils.o build/paging.o build/ISR.o build/IDT.o build/utils.o build/acpi.o
+build/kernel.elf: build/main.o build/entry.o build/video.o build/x86_64_utils.o build/paging.o build/ISR.o build/IDT.o build/utils.o build/acpi.o build/smp_obj.o
 	$(GCC_TOOLS_PREFIX)ld -m elf_x86_64 -T src/link.ld $^ -o $@
 
 clean:
