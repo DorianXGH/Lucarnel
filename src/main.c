@@ -18,6 +18,7 @@ struct stivale_header stivalehd __attribute__((section(".stivalehdr"),used)) = {
 
 struct stivale_struct stivale_global_info;
 uint32_t procnum = 0;
+int init_system();
 
 int main(struct stivale_struct *stivale_info)
 {
