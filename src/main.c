@@ -8,6 +8,7 @@
 #include "includes/interrupts.h"
 #include "includes/utils.h"
 #include "includes/acpi.h"
+#include "smp/smp.h"
 
 uint8_t kernel_stack[0x1000] __attribute__((section(".stack"),used)) = {0};
 struct stivale_header stivalehd __attribute__((section(".stivalehdr"),used)) = {
@@ -44,5 +45,6 @@ int main(struct stivale_struct *stivale_info)
     putString("idt\0",0,128+64,stivale_info,0x00FF00FF,0xFF000000,2);
 
     init_kernel_acpi(stivale_info->rsdp);
+    smp_bootstrap_install();
 
 }
