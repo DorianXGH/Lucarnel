@@ -1,4 +1,4 @@
-
+#include "smp.h"
 void smp_long_bootstrap()
 {
 
