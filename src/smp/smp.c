@@ -1,7 +1,16 @@
 #include "smp.h"
+
 void smp_long_bootstrap()
 {
-
+    _lgdt(&gdtd);
+    _lidt(&idtd);
+    struct CR3 cr3 = {
+        0, // PCID or flags
+        (uintptr_t)pml4 >> 12,
+        0 // nullbits
+    };
+    _lcr3(&cr3);
+    init_system();
 }
 
 void smp_bootstrap_install()

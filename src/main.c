@@ -17,6 +17,7 @@ struct stivale_header stivalehd __attribute__((section(".stivalehdr"),used)) = {
 };
 
 struct stivale_struct stivale_global_info;
+uint32_t procnum = 0;
 
 int main(struct stivale_struct *stivale_info)
 {
@@ -46,5 +47,14 @@ int main(struct stivale_struct *stivale_info)
 
     init_kernel_acpi(stivale_info->rsdp);
     smp_bootstrap_install();
+    init_system();
+}
 
+int init_system()
+{
+    procnum++;
+    putString("proc\0",200,128+64,&stivale_global_info,0x00FF00FF,0xFF000000,2);
+    uint8_t procnumstr[19];
+    itohex(procnum,procnumstr);
+    putString(procnumstr,300,128+64,&stivale_global_info,0x00FF00FF,0xFF000000,2);
 }

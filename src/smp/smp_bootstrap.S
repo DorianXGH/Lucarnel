@@ -10,7 +10,7 @@
 %define BUFFER       0xA000
 %define STACK        0x9FFF
 
-%define smp_long_bootstrap 0x00200000
+%define smp_long_bootstrap 0x001F0000
 
 
  

@@ -44,7 +44,7 @@ _SMP_START_ = .;
     *(.smp_btstrp)
 _SMP_END_ = .;
   } :main
-  . = 0x00200000;
+  . = 0x001F0000;
   .long_btstrp :  {
     *(long_btstrp)
   } :main
