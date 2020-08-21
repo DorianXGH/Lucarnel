@@ -3,6 +3,7 @@
 #include "../video/video.h"
 #include "../includes/stivale.h"
 #include "../includes/x86_64_utils.h"
+#include "../includes/utils.h"
 #include "../includes/interrupts.h"
 #include "../includes/memory_structs.h"
 

@@ -1,4 +1,5 @@
 SECTION .smp_btstrp
+[BITS 64]
 global smp_start
 global smp_end
 
