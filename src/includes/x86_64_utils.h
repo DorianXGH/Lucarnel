@@ -10,3 +10,8 @@ static inline void outb(uint16_t port, uint8_t val)
 {
     __asm__ volatile( "outb %0, %1" : : "Nd"(port), "a"(val) );
 }
+
+static inline void io_wait()
+{
+    outb(0x80, 0);
+}

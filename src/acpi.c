@@ -95,7 +95,9 @@ void parse_madt()
     current += sizeof(struct MADTLocal_APIC);
 
     struct APICConfig* local_apic_config = (struct APICConfig*)((uintptr_t)(lapic->address));
+    putString("init lapic\0",0,200,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
     init_lapic(local_apic_config);
+    putString("init lapic done\0",0,200,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
     int i = 0;
     while (current < max) // for each entry
     {
