@@ -48,11 +48,11 @@ void init_kernel_acpi(struct RSDP2* rsdp)
     putString("num \0",0,50,&stivale_global_info,0xFFFFFFFF,0x00FF0000,1);
     putString(numentries,32,50,&stivale_global_info,0xFFFFFFFF,0x00FF0000,1);
 
-    uint64_t* other_tables = (uintptr_t)xsdt + sizeof(struct ACPISDTHeader);
+    uint64_t* other_tables = (uint64_t*)((uintptr_t)xsdt + sizeof(struct ACPISDTHeader));
     uint8_t sig[5];
     sig[4] = 0;
     uint8_t addrentry[19];
-    itohex(other_tables,addrentry);
+    itohex((uint64_t)other_tables,addrentry);
     putString(addrentry,8*40,60,&stivale_global_info,0xFFFFFFFF,0x00FF0000,1);
 
     for(int i = 0; i < entries; i++)
@@ -82,9 +82,9 @@ void init_kernel_acpi(struct RSDP2* rsdp)
 
 void parse_madt()
 {
-    uintptr_t max = madt + (madt->length);
+    uintptr_t max = (uintptr_t)madt + (madt->length);
     uintptr_t current = (uintptr_t)madt + sizeof(struct ACPISDTHeader);
-    struct MADTLocal_APIC* lapic = current;
+    struct MADTLocal_APIC* lapic = (struct MADTLocal_APIC*)current;
     uint8_t addrapic[19];
     itohex(lapic->address,addrapic);
     putString("loc\0",0,200,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
@@ -94,7 +94,7 @@ void parse_madt()
     putString(flagsapic,8*20,210,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
     current += sizeof(struct MADTLocal_APIC);
 
-    struct APICConfig* local_apic_config = lapic->address;
+    struct APICConfig* local_apic_config = (struct APICConfig*)((uintptr_t)(lapic->address));
     init_lapic(local_apic_config);
     int i = 0;
     while (current < max) // for each entry
