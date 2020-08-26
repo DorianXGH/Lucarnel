@@ -1,6 +1,8 @@
 #pragma once
 #include <stdint.h>
 #include "assert.h"
+#include "interrupts.h"
+#include "x86_64_utils.h"
 
 struct APICRegister 
 {
