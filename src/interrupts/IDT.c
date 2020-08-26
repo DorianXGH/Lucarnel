@@ -48,7 +48,7 @@ void init_IDT()
     IDT[255] = gen_IDT_entry((uintptr_t)ISR_spurious);
     idtd = (struct IDTD) {
         (IDT_SIZE*16)-1,
-        &IDT
+        (uintptr_t)&IDT
     };
     _lidt(&idtd);
 }
