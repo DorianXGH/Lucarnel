@@ -36,7 +36,12 @@ void init_IDT()
     IDT[12] = gen_IDT_entry((uintptr_t)ISR_stack_segment_fault_handler);
     IDT[13] = gen_IDT_entry((uintptr_t)ISR_general_protection_fault_handler);
     IDT[14] = gen_IDT_entry((uintptr_t)ISR_page_fault_handler);
-    for(int i = 15; i < 255; i++)
+    IDT[32] = gen_IDT_entry((uintptr_t)IRQ_timer);
+    for(int i = 15; i < 32; i++)
+    {
+        IDT[i] = gen_IDT_entry((uintptr_t)ISR_spurious);
+    }
+    for(int i = 33; i < 255; i++)
     {
         IDT[i] = gen_IDT_entry((uintptr_t)ISR_spurious);
     }

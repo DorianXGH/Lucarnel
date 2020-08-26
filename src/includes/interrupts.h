@@ -48,4 +48,9 @@ __attribute__((interrupt)) void ISR_general_protection_fault_handler(struct IFra
 __attribute__((interrupt)) void ISR_page_fault_handler(struct IFrame* interrupt_frame, uint64_t error_code);
 __attribute__((interrupt)) void ISR_spurious(struct IFrame* interrupt_frame);
 
+__attribute__((interrupt)) void IRQ_timer(struct IFrame* interrupt_frame);
+
 void init_IDT();
+void init_pit();
+
+uint64_t get_current_tick();
