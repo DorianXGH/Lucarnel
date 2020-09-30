@@ -1,3 +1,5 @@
 build/**
 run.sh
 makefile
+.doit.db
+__pycache__
