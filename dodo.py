@@ -1,5 +1,8 @@
 import os
 import pconf
+from powerliner import *
+from powerliner import tasker
+from doit.reporter import ConsoleReporter
 
 GCC_ASM_ARGS = "-masm=intel"
 GAS_ASM_ARGS = "-msyntax=intel -mnaked-reg"
@@ -26,6 +29,55 @@ asm_sources = [
     "src/entry.S",
     "src/x86_64_utils.S"
 ]
+
+
+class MyReporter(ConsoleReporter):
+    def splitter(self, task):
+        title = task.title()
+        handle_file = str(title).split(":", 1)
+        if(len(handle_file) == 1):
+            return [" "+handle_file[0]+" ", ""]
+        else:
+            return [" "+handle_file[0]+" ", handle_file[1]]
+
+    def execute_task(self, task):
+        split_title = self.splitter(task)
+        self.write(PowerlineSequence(
+            [["Black", "Grey", split_title[0]]] +
+            tasker(split_title[1], "..."), True).render(["Right"])+"\r")
+
+    def add_failure(self, task, exception):
+        """called when execution finishes with a failure"""
+        split_title = self.splitter(task)
+        self.write("\33[2K"+PowerlineSequence([["Black", "Grey", split_title[0]]] +
+                                              tasker(split_title[1], "ERROR", exception.get_name()), True).render(["Right"])+"\r\n")
+        result = {'task': task, 'exception': exception}
+        self.failures.append(result)
+        self._write_failure(result)
+
+    def add_success(self, task):
+        """called when execution finishes successfully"""
+        split_title = self.splitter(task)
+        self.write("\33[2K"+PowerlineSequence(
+            [["Black", "Grey", split_title[0]]] +
+            tasker(split_title[1], "OK"), True).render(["Right"])+"\r\n")
+
+    def skip_uptodate(self, task):
+        """skipped up-to-date task"""
+        split_title = self.splitter(task)
+        if task.name[0] != '_':
+            self.write(PowerlineSequence([["Black", "Grey", split_title[0]]] +
+                                         tasker(split_title[1], "SKIPPED"), True).render(["Right"])+"\r\n")
+
+    def skip_ignore(self, task):
+        """skipped ignored task"""
+        split_title = self.splitter(task)
+        self.write(PowerlineSequence(
+            [["Black", "Grey", split_title[0]]] +
+            tasker(split_title[1], "IGNORED"), True).render(["Right"])+"\r\n")
+
+
+DOIT_CONFIG = {'reporter': MyReporter}
 
 
 def generate_deps(c_source):

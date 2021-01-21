@@ -4,3 +4,4 @@ makefile
 .doit.db
 __pycache__
 pconf.py
+src/smp/smp_bootstrap.bin
