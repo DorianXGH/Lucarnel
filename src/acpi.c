@@ -9,6 +9,10 @@ extern struct stivale_struct stivale_global_info;
 struct ACPISDTHeader* xsdt;
 struct ACPISDTHeader* madt = 0;
 
+// --------------------------- //
+// Check ACPI header integrity //
+// --------------------------- //
+
 bool do_checksum(struct ACPISDTHeader* table_header)
 {
     uint8_t sum = 0;
@@ -19,8 +23,16 @@ bool do_checksum(struct ACPISDTHeader* table_header)
     return sum == 0;
 }
 
+// ------------------------------------------------------- //
+// Retrieves and initializes ACPI related systems and info //
+// ------------------------------------------------------- //
+
 void init_kernel_acpi(struct RSDP2* rsdp)
 {
+    // ----------------- //
+    // Check ACPI header //
+    // ----------------- //
+
     if(rsdp->header.revision != 2)
     {
         putString("ACPI 2 or more needed\0",0,10,&stivale_global_info,0xFFFFFFFF,0x00FF0000,1);
@@ -30,6 +42,10 @@ void init_kernel_acpi(struct RSDP2* rsdp)
     {
         putString("RSDP Valid\0",0,20,&stivale_global_info,0xFFFFFFFF,0x00FF0000,1);
     }
+
+    // ------------------------------ //
+    // Retrieve XSDT and check header //
+    // ------------------------------ //
 
     uint8_t xsdtaddr[19];
     itohex(rsdp->xsdt_address,xsdtaddr);
@@ -41,6 +57,10 @@ void init_kernel_acpi(struct RSDP2* rsdp)
     {
         putString("XSDT valid\0",0,40,&stivale_global_info,0xFFFFFFFF,0x00FF0000,1);
     }
+
+    // --------------------- //
+    // Retrieve other tables //
+    // --------------------- //
 
     uint64_t entries = (xsdt->length - sizeof(struct ACPISDTHeader)) / 8;
     uint8_t numentries[19];
@@ -65,6 +85,10 @@ void init_kernel_acpi(struct RSDP2* rsdp)
         }
         putString(sig,0,60+10*i,&stivale_global_info,0xFFFFFFFF,0x00FF0000,1);
         
+        // --------- //
+        // Find MADT //
+        // --------- //
+
         if(arrcmp(sig,"APIC",4))
         {
             madt = entry;
@@ -80,8 +104,16 @@ void init_kernel_acpi(struct RSDP2* rsdp)
     }
 }
 
+// ----------- //
+// Parses MADT //
+// ----------- //
+
 void parse_madt()
 {
+    // ------------------- //
+    // Get local APIC info //
+    // ------------------- //
+
     uintptr_t max = (uintptr_t)madt + (madt->length);
     uintptr_t current = (uintptr_t)madt + sizeof(struct ACPISDTHeader);
     struct MADTLocal_APIC* lapic = (struct MADTLocal_APIC*)current;
@@ -94,10 +126,19 @@ void parse_madt()
     putString(flagsapic,8*20,210,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
     current += sizeof(struct MADTLocal_APIC);
 
+    // --------------- //
+    // Configure LAPIC //
+    // --------------- //
+
     struct APICConfig* local_apic_config = (struct APICConfig*)((uintptr_t)(lapic->address));
     putString("init lapic\0",0,200,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
     init_lapic(local_apic_config);
     putString("init lapic done\0",0,200,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
+
+    // ------------------- //
+    // Get the other APICs //
+    // ------------------- //
+
     int i = 0;
     while (current < max) // for each entry
     {
