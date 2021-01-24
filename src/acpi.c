@@ -108,6 +108,22 @@ void init_kernel_acpi(struct RSDP2* rsdp)
 // Parses MADT //
 // ----------- //
 
+void write_ioapic_register(const uintptr_t apic_base, const uint8_t offset, const uint32_t val) 
+{
+    /* tell IOREGSEL where we want to write to */
+    *(volatile uint32_t*)(apic_base) = offset;
+    /* write the value to IOWIN */
+    *(volatile uint32_t*)(apic_base + 0x10) = val; 
+}
+ 
+uint32_t read_ioapic_register(const uintptr_t apic_base, const uint8_t offset)
+{
+    /* tell IOREGSEL where we want to read from */
+    *(volatile uint32_t*)(apic_base) = offset;
+    /* return the data from IOWIN */
+    return *(volatile uint32_t*)(apic_base + 0x10);
+}
+
 void parse_madt()
 {
     // ------------------- //
@@ -131,9 +147,7 @@ void parse_madt()
     // --------------- //
 
     struct APICConfig* local_apic_config = (struct APICConfig*)((uintptr_t)(lapic->address));
-    putString("init lapic\0",0,200,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
-    init_lapic(local_apic_config);
-    putString("init lapic done\0",0,200,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
+    
 
     // ------------------- //
     // Get the other APICs //
@@ -156,6 +170,24 @@ void parse_madt()
             putString(apicid,8*20,220+10*i,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
             putString(flags,8*40,220+10*i,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
         }
+        if(entry->entry_type == 1)
+        {
+            struct IOAPIC* apic = (struct IOAPIC*)entry;
+            uint8_t id[19];
+            itohex(apic->IOAPIC_ID,id);
+            uint8_t gsi[19];
+            itohex(apic->GSI_base,gsi);
+            uint8_t addrmmio[19];
+            itohex(apic->address,addrmmio);
+            putString(id,0,220+10*i,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
+            putString(gsi,8*20,220+10*i,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
+            putString(addrmmio,8*40,220+10*i,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
+            if(apic->GSI_base == 0)
+            {
+                write_ioapic_register(apic->address,0x10,0x00000020);
+                write_ioapic_register(apic->address,0x11,(local_apic_config->LAPIC_ID.reg & 0xF)<<24);
+            }
+        }
         i++;
         if(entry->length == 0)
         {
@@ -172,4 +204,7 @@ void parse_madt()
         itohex(max,acpientryparsed);
         putString(acpientryparsed,350,20,&stivale_global_info,0x00FF0000,0xFF000000,1);
     }
+    putString("init lapic\0",0,200,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
+    init_lapic(local_apic_config);
+    putString("init lapic done\0",0,200,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
 }

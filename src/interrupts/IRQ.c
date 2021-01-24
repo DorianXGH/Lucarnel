@@ -1,4 +1,5 @@
 #include "../includes/interrupts.h"
+#include "../includes/apic.h"
 #include "../includes/stivale.h"
 #include "../video/video.h"
 #include "../includes/x86_64_utils.h"
@@ -7,6 +8,7 @@
 uint64_t tick = 0;
 
 extern struct stivale_struct stivale_global_info;
+extern struct APICConfig* lapic_regs;
 
 void init_pit()
 {
@@ -26,17 +28,18 @@ void init_pit()
     io_wait();
     outb(0xA1, 0x01);
     io_wait();
-    outb(0x21, 0x0); // not masked
+    outb(0x21, 0x00); // not masked
     io_wait();
-    outb(0xA1, 0x0); // not masked
+    outb(0xA1, 0x00); // not masked
     io_wait();
-
-    outb(0x43, 0x36);
+    outb(0x20, 0x20); // no interrupts pending
+    
 
     uint32_t divisor = 0x1234dc / 1000; // 1 khz : 1ms
     uint8_t l = divisor & 0xff;
     uint8_t h = (divisor >> 8) & 0xff;
 
+    outb(0x43, 0x36);
     outb(0x40, l);
     outb(0x40, h);
 }
@@ -47,6 +50,8 @@ __attribute__((interrupt)) void IRQ_timer(struct IFrame* interrupt_frame) {
     uint8_t tickstr[19];
     itohex(tick,tickstr);
     putString(tickstr,40,0,&stivale_global_info,0xFFFFFFFF,0xFFFF0000,1);
+    outb(0x20, 0x20);
+    lapic_regs->end_of_interrupt.reg = 0;
 }
 
 uint64_t get_current_tick()
