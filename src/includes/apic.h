@@ -3,6 +3,7 @@
 #include "assert.h"
 #include "interrupts.h"
 #include "x86_64_utils.h"
+#include <stdbool.h>
 
 struct APICRegister 
 {

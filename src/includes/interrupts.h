@@ -51,6 +51,5 @@ __attribute__((interrupt)) void ISR_spurious(struct IFrame* interrupt_frame);
 __attribute__((interrupt)) void IRQ_timer(struct IFrame* interrupt_frame);
 
 void init_IDT();
-void init_pit();
 
 uint64_t get_current_tick();

@@ -8,7 +8,7 @@ GCC_ASM_ARGS = "-masm=intel"
 GAS_ASM_ARGS = "-msyntax=intel -mnaked-reg"
 GCC_TARGET_ARGS = "-ffreestanding -mno-red-zone -std=c11 -Werror -fcompare-debug-second"
 GCC_INTERRUPT_ARGS = "-mgeneral-regs-only"
-GCC_TOOLS_PREFIX = pconf.XTOOLS_PATH + "x86_64-elf-"
+GCC_TOOLS_PREFIX = "/home/dorian/opt/cross/bin/" + "x86_64-elf-"
 
 c_sources = [
     "src/main.c",
