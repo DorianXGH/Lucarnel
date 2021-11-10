@@ -15,7 +15,6 @@ c_sources = [
     "src/video/video.c",
     "src/memory/paging.c",
     "src/utils.c",
-    "src/smp/smp.c",
     "src/interrupts/apic.c",
     "src/acpi.c",
 ]
@@ -128,28 +127,9 @@ def task_assemble_normal():
             'clean': True,
         }
 
-
-def task_assemble_bootstrap_bin():
-    return {
-        'file_dep': ["src/smp/smp_bootstrap.S"],
-        'targets': ["src/smp/smp_bootstrap.bin"],
-        'actions': ['nasm %s -o %s -f bin' % ("src/smp/smp_bootstrap.S", "src/smp/smp_bootstrap.bin")],
-        'clean': True,
-    }
-
-
-def task_assemble_bootstrap_wrap():
-    return {
-        'file_dep': ["src/smp/smp_obj.S", "src/smp/smp_bootstrap.bin"],
-        'targets': ["build/smp_obj.o"],
-        'actions': ['nasm %s -o %s -f elf64' % ("src/smp/smp_obj.S", "build/smp_obj.o")],
-        'clean': True,
-    }
-
-
 def task_link():
     deps = [generate_obj_path(src) for src in (
-        c_sources + asm_sources + interrupts_sources)] + ["build/smp_obj.o"]
+        c_sources + asm_sources + interrupts_sources)]
     return {
         'file_dep': deps,
         'targets': ["build/kernel.elf"],

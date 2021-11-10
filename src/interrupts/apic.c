@@ -26,8 +26,13 @@ void init_lapic(struct APICConfig* apicconf)
     apicconf->timer_divide_configuration.reg = 0x3; // divide by 16
     apicconf->timer_initial_count.reg = 0xFFFFFFFF; // count from -1
     pit_wait(1);
-    apicconf->timer_initial_count.reg = 0xFFFFFFFF - apicconf->timer_current_count.reg;
-    apicconf->LVT_timer.reg = 0x20020;
+
+    uint64_t inicount = 0xFFFFFFFF - apicconf->timer_current_count.reg;
+
     apicconf->spurious_interrupt_vector.reg = 0x1FF; // enable apic + set spurious to FF;
+    apicconf->timer_divide_configuration.reg = 0x3; // divide by 16
+    apicconf->timer_initial_count.reg = inicount; // this resets the LAPIC -> reconfigure
+    apicconf->LVT_timer.reg = 0x20020;
+    
     __asm__ volatile ("sti");
 }
