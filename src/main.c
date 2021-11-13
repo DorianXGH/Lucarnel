@@ -42,6 +42,8 @@ int main(struct stivale_struct *stivale_info)
     {
         putChar(i,(i-'a')*16,256,stivale_info,0x00FFFFFF,0x00FF0000,2);
     }
+    register_framebuffer(stivale_info);
+    clear();
 
     // ------------------------------ //
     // Initializing Memory Protection //
@@ -76,7 +78,7 @@ int main(struct stivale_struct *stivale_info)
 int init_system()
 {
     procnum++;
-    putString("proc\0",200,128+64,&stivale_global_info,0x00FF00FF,0xFF000000,2);
+    putString("pric\0",200,128+64,&stivale_global_info,0x00FF00FF,0xFF000000,2);
     uint8_t procnumstr[19];
     itohex(procnum,procnumstr);
     putString(procnumstr,300,128+64,&stivale_global_info,0x00FF00FF,0xFF000000,2);

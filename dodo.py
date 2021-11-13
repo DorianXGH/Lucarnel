@@ -17,6 +17,7 @@ c_sources = [
     "src/utils.c",
     "src/interrupts/apic.c",
     "src/acpi.c",
+    "src/pci.c",
 ]
 interrupts_sources = [
     "src/interrupts/ISR.c",

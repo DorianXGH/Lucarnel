@@ -413,6 +413,12 @@ uint8_t chars[][8 * 10] = {
 };
 char charmap[256];
 
+uint64_t framebuffer_width;
+uint64_t framebuffer_height;
+uint64_t framebuffer_pitch;
+uint64_t framebuffer_addr;
+
+
 void initCharMap()
 {
     charmap[' '] = 0;
@@ -505,5 +511,26 @@ void putString(uint8_t *s, uint64_t x, uint64_t y, struct stivale_struct *stival
     {
         int effx = (x + (8 * zoomfactor * i));
         putChar(s[i], effx % (stivale->framebuffer_width), y + (10 * zoomfactor * (effx / (stivale->framebuffer_width))), stivale, foreground, background, zoomfactor);
+    }
+}
+
+void register_framebuffer(struct stivale_struct *stivale)
+{
+    framebuffer_height = stivale->framebuffer_height;
+    framebuffer_width = stivale->framebuffer_width;
+    framebuffer_pitch = stivale->framebuffer_pitch;
+    framebuffer_addr = stivale->framebuffer_addr;
+}
+
+void clear()
+{
+    
+    for(uint64_t i = 0; i < framebuffer_height; i++)
+    {
+        uint32_t* frmb = (uint32_t*) (framebuffer_addr + i*framebuffer_pitch) ;
+        for(uint64_t j = 0; j < framebuffer_width; j++) 
+        {
+            frmb[j] = 0;
+        }
     }
 }

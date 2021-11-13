@@ -33,6 +33,22 @@ struct ACPISDTHeader
     uint32_t creator_revision;
 } __attribute__((packed));
 
+struct MCFGEntry
+{
+    uint64_t base;
+    uint16_t segment_group;
+    uint8_t  bus_start;
+    uint8_t  bus_end;
+    uint32_t reserved;
+} __attribute__((packed));
+
+struct MCFG
+{
+    struct ACPISDTHeader header;
+    uint64_t reserved;
+    struct MCFGEntry entries[];
+} __attribute__((packed));
+
 struct MADTEntry_header 
 {
     uint8_t entry_type;

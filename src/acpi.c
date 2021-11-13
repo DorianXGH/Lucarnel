@@ -3,6 +3,7 @@
 #include "video/video.h"
 #include "includes/utils.h"
 #include "includes/apic.h"
+#include "includes/pci.h"
 
 extern struct stivale_struct stivale_global_info;
 
@@ -94,6 +95,8 @@ void init_kernel_acpi(struct RSDP2* rsdp)
             madt = entry;
             putString("apic",8*30,60+10*i,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
         }
+        //if(arrcmp(sig,"MCFG",4))
+            //init_pci_tree((struct MCFG*)entry);
         
         itohex(other_tables[i],addrentry);
         putString(addrentry,8*5,60+10*i,&stivale_global_info,0xFFFFFFFF,0x00FF0000,1);
