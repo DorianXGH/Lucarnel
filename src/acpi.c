@@ -9,6 +9,7 @@ extern struct stivale_struct stivale_global_info;
 
 struct ACPISDTHeader* xsdt;
 struct ACPISDTHeader* madt = 0;
+struct ACPISDTHeader* mcfg = 0;
 
 // --------------------------- //
 // Check ACPI header integrity //
@@ -95,8 +96,10 @@ void init_kernel_acpi(struct RSDP2* rsdp)
             madt = entry;
             putString("apic",8*30,60+10*i,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
         }
-        //if(arrcmp(sig,"MCFG",4))
-            //init_pci_tree((struct MCFG*)entry);
+        if(arrcmp(sig,"MCFG",4))
+            mcfg = entry;
+            putString("pci",8*30,60+10*i,&stivale_global_info,0xFFFFFFFF,0x000000FF,1);
+            
         
         itohex(other_tables[i],addrentry);
         putString(addrentry,8*5,60+10*i,&stivale_global_info,0xFFFFFFFF,0x00FF0000,1);
@@ -104,6 +107,10 @@ void init_kernel_acpi(struct RSDP2* rsdp)
     if(madt != 0)
     {
         parse_madt();
+    }
+    if(mcfg != 0)
+    {
+        init_pci_tree((struct MCFG*)mcfg);
     }
 }
 
