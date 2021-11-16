@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "../includes/stivale.h"
-#define BLOCK_SIZE (1 << 20)
+#define MAX_ALLOC (1 << 14) // 16K allocations
 
 struct memory_block_seg {
     uint64_t base;
@@ -10,8 +10,15 @@ struct memory_block_seg {
     bool     allocated;
 };
 
+
 void register_mmap(struct mmap_entry * base, uint64_t count);
+
 void regroup();
-void resort();
+
+bool compare_len(uint64_t i, uint64_t j);
+bool compare_base(uint64_t i, uint64_t j);
+
+void sort_merge(uint64_t l, uint64_t r, uint64_t sz, bool(* comp)(uint64_t,uint64_t));
 void sort();
-void * kmalloc(uint64_t size);
+void * pmalloc(uint64_t size);
+void free(void * ptr);
