@@ -7,8 +7,12 @@
 struct memory_block_seg {
     uint64_t base;
     uint64_t len; // 0 means the struct is non valid;
-    bool     allocated;
-};
+    uint8_t  allocated :1;
+    uint8_t  bitmap_allocated :1;
+    uint8_t  full :1;
+    uint64_t allocated_count :59;
+    uint64_t first_free;
+} __attribute__((packed));
 
 
 void register_mmap(struct mmap_entry * base, uint64_t count);

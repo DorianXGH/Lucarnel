@@ -118,3 +118,9 @@ struct PTE {
     uint8_t execution_disabled: 1;
 } __attribute__((packed)) ;
 STATIC_ASSERT(sizeof(struct PTE) == 8, wrong_PTE_size);
+
+enum PAGE_SIZE {
+    PS_4K,
+    PS_2M,
+    PS_1G,
+};
