@@ -24,7 +24,7 @@ int main(struct stivale_struct *stivale_info)
     // --------------------------- //
     // Initializing Video feedback //
     // --------------------------- //
-
+    
     uint32_t *VMEM = (uint32_t *)(stivale_info->framebuffer_addr);
     VMEM[0] = 0xFF00FF00;
     VMEM[1] = 0xFF00FF00;
@@ -32,17 +32,8 @@ int main(struct stivale_struct *stivale_info)
     VMEM[3] = 0xFF00FF00;
 
     initCharMap();
-
-    putChar(' ',0,20,stivale_info,0xFF000000,0xFF000000,2);
-    putChar(' ',16,20,stivale_info,0x00FF0000,0x00FF0000,2);
-    putChar(' ',32,20,stivale_info,0x0000FF00,0x0000FF00,2);
-    putChar(' ',48,20,stivale_info,0x000000FF,0x000000FF,2);
-
-    for(char i = 'a'; i <= 'z'; i++)
-    {
-        putChar(i,(i-'a')*16,256,stivale_info,0x00FFFFFF,0x00FF0000,2);
-    }
     register_framebuffer(stivale_info);
+
     clear();
 
     // ------------------------------ //
@@ -50,10 +41,10 @@ int main(struct stivale_struct *stivale_info)
     // ------------------------------ //
 
     _lgdt(&gdtd);
-    putString("gdt\0",0,64,stivale_info,0x00FF00FF,0xFF000000,2);
+    putString("gdt\0",0,64,0x00FF00FF,0xFF000000,2);
 
     paging_init_identity();
-    putString("paging\0",0,128,stivale_info,0x00FF00FF,0xFF000000,2);
+    putString("paging\0",0,128,0x00FF00FF,0xFF000000,2);
 
     stivale_global_info = *stivale_info;
 
@@ -62,7 +53,7 @@ int main(struct stivale_struct *stivale_info)
     // ----------------------- //
 
     init_IDT();
-    putString("idt\0",0,128+64,stivale_info,0x00FF00FF,0xFF000000,2);
+    putString("idt\0",0,128+64,0x00FF00FF,0xFF000000,2);
 
     // -------------------- //
     // Retrieving ACPI info //
@@ -70,7 +61,7 @@ int main(struct stivale_struct *stivale_info)
     
     init_kernel_acpi((struct RSDP2*)stivale_info->rsdp);
     
-    putString("parsed\0",300,0,&stivale_global_info,0x00FF00FF,0xFF000000,2);
+    putString("parsed\0",300,0,0x00FF00FF,0xFF000000,2);
 
     init_system();
 }
@@ -78,9 +69,9 @@ int main(struct stivale_struct *stivale_info)
 int init_system()
 {
     procnum++;
-    putString("pric\0",200,128+64,&stivale_global_info,0x00FF00FF,0xFF000000,2);
+    putString("pric\0",200,128+64,0x00FF00FF,0xFF000000,2);
     uint8_t procnumstr[19];
     itohex(procnum,procnumstr);
-    putString(procnumstr,300,128+64,&stivale_global_info,0x00FF00FF,0xFF000000,2);
+    putString(procnumstr,300,128+64,0x00FF00FF,0xFF000000,2);
     while (1) {}
 }

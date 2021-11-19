@@ -488,13 +488,13 @@ void initCharMap()
     charmap['9'] = 36;
 }
 
-void putChar(uint8_t c, uint64_t x, uint64_t y, struct stivale_struct *stivale, uint32_t foreground, uint32_t background, uint8_t zoomfactor)
+void putChar(uint8_t c, uint64_t x, uint64_t y, uint32_t foreground, uint32_t background, uint8_t zoomfactor)
 {
-    if (x + zoomfactor * 8 < stivale->framebuffer_width && y + zoomfactor * 8 < stivale->framebuffer_height)
+    if (x + zoomfactor * 8 < framebuffer_width && y + zoomfactor * 8 < framebuffer_height)
     {
         for (uint64_t row = 0; row < zoomfactor * 10; row++)
         {
-            uint64_t j = (row + y) * stivale->framebuffer_pitch + stivale->framebuffer_addr;
+            uint64_t j = (row + y) * framebuffer_pitch + framebuffer_addr;
             for (uint64_t i = 0; i < zoomfactor * 8; i++)
             {
                 uint32_t* pix = (uint32_t*)(j + 4 * (x + i));
@@ -505,12 +505,12 @@ void putChar(uint8_t c, uint64_t x, uint64_t y, struct stivale_struct *stivale, 
     }
 }
 
-void putString(uint8_t *s, uint64_t x, uint64_t y, struct stivale_struct *stivale, uint32_t foreground, uint32_t background, uint8_t zoomfactor)
+void putString(uint8_t *s, uint64_t x, uint64_t y, uint32_t foreground, uint32_t background, uint8_t zoomfactor)
 {
     for (int i = 0; s[i] != 0; i++)
     {
         int effx = (x + (8 * zoomfactor * i));
-        putChar(s[i], effx % (stivale->framebuffer_width), y + (10 * zoomfactor * (effx / (stivale->framebuffer_width))), stivale, foreground, background, zoomfactor);
+        putChar(s[i], effx % framebuffer_width, y + (10 * zoomfactor * (effx / framebuffer_width)), foreground, background, zoomfactor);
     }
 }
 

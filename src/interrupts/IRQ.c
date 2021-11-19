@@ -8,16 +8,15 @@
 uint64_t tick = 0;
 uint64_t stick = 0;
 
-extern struct stivale_struct stivale_global_info;
 extern struct APICConfig* lapic_regs;
 
 __attribute__((interrupt)) void IRQ_timer(struct IFrame* interrupt_frame) {
     tick++;
     if(tick%1000 == 0) {
-        putString("tick",0,0,&stivale_global_info,0xFFFFFFFF,0xFFFF0000,1);
+        putString("tick",0,0,0xFFFFFFFF,0xFFFF0000,1);
         uint8_t tickstr[19];
         itohex(stick,tickstr);
-        putString(tickstr,40,0,&stivale_global_info,0xFFFFFFFF,0xFFFF0000,1);
+        putString(tickstr,40,0,0xFFFFFFFF,0xFFFF0000,1);
         stick++;
     }
     outb(0x20, 0x20);

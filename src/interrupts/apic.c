@@ -3,7 +3,6 @@
 #include "../video/video.h"
 #include "../includes/utils.h"
 
-extern struct stivale_struct stivale_global_info;
 struct APICConfig* lapic_regs;
 
 void pit_wait(uint16_t ms) {
