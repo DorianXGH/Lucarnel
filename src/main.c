@@ -61,8 +61,8 @@ int main(struct stivale_struct *stivale_info)
     // Physical Memory Allocator //
     // ------------------------- //
 
-    //register_mmap((struct mmap_entry *) stivale_info->memory_map_addr,stivale_info->memory_map_entries);
-    //print("physical memory allocator initialized\n");
+    register_mmap((struct mmap_entry *) stivale_info->memory_map_addr,stivale_info->memory_map_entries);
+    print("physical memory allocator initialized\n");
 
     // -------------------- //
     // Retrieving ACPI info //
@@ -78,7 +78,7 @@ int main(struct stivale_struct *stivale_info)
 int init_system()
 {
     procnum++;
-    //print("proc ");
+    print("proc ");
     print_num(procnum);
     print("\n");
     while (1) {}
