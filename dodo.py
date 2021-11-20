@@ -19,7 +19,7 @@ c_sources = [
     "src/acpi.c",
     "src/pci.c",
     "src/memory/mmap.c",
-    "src/video/video.c"
+    "src/video/cons.c"
 ]
 interrupts_sources = [
     "src/interrupts/ISR.c",

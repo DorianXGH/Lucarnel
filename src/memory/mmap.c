@@ -16,6 +16,7 @@ void register_mmap(struct mmap_entry * base, uint64_t count)
             k++;
         }
     }
+    sort();
 }
 
 void regroup()
