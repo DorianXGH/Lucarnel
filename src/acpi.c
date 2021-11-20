@@ -4,6 +4,7 @@
 #include "includes/utils.h"
 #include "includes/apic.h"
 #include "includes/pci.h"
+#include "video/cons.h"
 
 struct ACPISDTHeader* xsdt;
 struct ACPISDTHeader* madt = 0;
@@ -35,27 +36,26 @@ void init_kernel_acpi(struct RSDP2* rsdp)
 
     if(rsdp->header.revision != 2)
     {
-        putString("ACPI 2 or more needed\0",0,10,0xFFFFFFFF,0x00FF0000,1);
+        print("ACPI 2 or more needed\n");
     }
 
     if(arrcmp(rsdp->header.signature,"RSD PTR ",8))
     {
-        putString("RSDP Valid\0",0,20,0xFFFFFFFF,0x00FF0000,1);
+        print("RSDP Valid\n");
     }
 
     // ------------------------------ //
     // Retrieve XSDT and check header //
     // ------------------------------ //
-
-    uint8_t xsdtaddr[19];
-    itohex(rsdp->xsdt_address,xsdtaddr);
-    putString(xsdtaddr,0,30,0xFF000000,0x00FFFFFF,1);
+    print("xsdt ");
+    print_num(rsdp->xsdt_address);
+    print("\n");
 
     xsdt = (struct ACPISDTHeader*)(rsdp->xsdt_address);
 
     if(do_checksum(xsdt) && arrcmp(xsdt->signature,"XSDT",4))
     {
-        putString("XSDT valid\0",0,40,0xFFFFFFFF,0x00FF0000,1);
+        print("XSDT valid\n");
     }
 
     // --------------------- //
@@ -63,17 +63,13 @@ void init_kernel_acpi(struct RSDP2* rsdp)
     // --------------------- //
 
     uint64_t entries = (xsdt->length - sizeof(struct ACPISDTHeader)) / 8;
-    uint8_t numentries[19];
-    itohex(entries,numentries);
-    putString("num \0",0,50,0xFFFFFFFF,0x00FF0000,1);
-    putString(numentries,32,50,0xFFFFFFFF,0x00FF0000,1);
+    print_num(entries);
+    print(" entries\n");
+    print("\n");
 
     uint64_t* other_tables = (uint64_t*)((uintptr_t)xsdt + sizeof(struct ACPISDTHeader));
     uint8_t sig[5];
     sig[4] = 0;
-    uint8_t addrentry[19];
-    itohex((uint64_t)other_tables,addrentry);
-    putString(addrentry,8*40,60,0xFFFFFFFF,0x00FF0000,1);
 
     for(int i = 0; i < entries; i++)
     {
@@ -83,8 +79,10 @@ void init_kernel_acpi(struct RSDP2* rsdp)
         {
             sig[k] = (entry->signature)[k];
         }
-        putString(sig,0,60+10*i,0xFFFFFFFF,0x00FF0000,1);
-        
+        print(sig);
+        print("   ");
+        print_num(other_tables[i]);
+        print("   ");
         // --------- //
         // Find MADT //
         // --------- //
@@ -92,15 +90,15 @@ void init_kernel_acpi(struct RSDP2* rsdp)
         if(arrcmp(sig,"APIC",4))
         {
             madt = entry;
-            putString("apic",8*30,60+10*i,0xFFFFFFFF,0x000000FF,1);
+            print("   apic");
         }
         if(arrcmp(sig,"MCFG",4))
+        {
             mcfg = entry;
-            putString("pci",8*30,60+10*i,0xFFFFFFFF,0x000000FF,1);
-            
+            print("   pci");
+        }
         
-        itohex(other_tables[i],addrentry);
-        putString(addrentry,8*5,60+10*i,0xFFFFFFFF,0x00FF0000,1);
+        print("\n");
     }
     if(madt != 0)
     {
@@ -143,11 +141,11 @@ void parse_madt()
     struct MADTLocal_APIC* lapic = (struct MADTLocal_APIC*)current;
     uint8_t addrapic[19];
     itohex(lapic->address,addrapic);
-    putString("loc\0",0,200,0xFFFFFFFF,0x000000FF,1);
-    putString(addrapic,0,210,0xFFFFFFFF,0x000000FF,1);
-    uint8_t flagsapic[19];
-    itohex(lapic->flags,flagsapic);
-    putString(flagsapic,8*20,210,0xFFFFFFFF,0x000000FF,1);
+    print("apic address ");
+    print_num(lapic->address);
+    print("\napic flags ");
+    print_num(lapic->flags);
+    print("\n");
     current += sizeof(struct MADTLocal_APIC);
 
     // --------------- //
@@ -167,29 +165,29 @@ void parse_madt()
         struct MADTEntry_header* entry = ((struct MADTEntry_header*)(current));
         if(entry->entry_type == 0)
         {
+            print("\nLAPIC\n\n");
             struct LAPIC* apic = (struct LAPIC*)entry;
-            uint8_t procid[19];
-            itohex(apic->processorID,procid);
-            uint8_t apicid[19];
-            itohex(apic->LAPIC_ID,apicid);
-            uint8_t flags[19];
-            itohex(apic->flags,flags);
-            putString(procid,0,220+10*i,0xFFFFFFFF,0x000000FF,1);
-            putString(apicid,8*20,220+10*i,0xFFFFFFFF,0x000000FF,1);
-            putString(flags,8*40,220+10*i,0xFFFFFFFF,0x000000FF,1);
+            print("processor id ");
+            print_num(apic->processorID);
+            print("\napic id ");
+            print_num(apic->LAPIC_ID);
+            print("\napic flags ");
+            print_num(apic->flags);
+            print("\n");
         }
         if(entry->entry_type == 1)
         {
+            print("\nIOAPIC\n\n");
             struct IOAPIC* apic = (struct IOAPIC*)entry;
-            uint8_t id[19];
-            itohex(apic->IOAPIC_ID,id);
-            uint8_t gsi[19];
-            itohex(apic->GSI_base,gsi);
-            uint8_t addrmmio[19];
-            itohex(apic->address,addrmmio);
-            putString(id,0,220+10*i,0xFFFFFFFF,0x000000FF,1);
-            putString(gsi,8*20,220+10*i,0xFFFFFFFF,0x000000FF,1);
-            putString(addrmmio,8*40,220+10*i,0xFFFFFFFF,0x000000FF,1);
+
+            print("ioapic id ");
+            print_num(apic->IOAPIC_ID);
+            print("\ngsi base ");
+            print_num(apic->GSI_base);
+            print("\nmmio address ");
+            print_num(apic->address);
+            print("\n");
+
             if(apic->GSI_base == 0)
             {
                 write_ioapic_register(apic->address,0x10,0x00000020);
@@ -202,15 +200,6 @@ void parse_madt()
             break;
         }
         current += entry->length;
-
-        putString("acpi\0",300,0,0x00FF0000,0xFF000000,1);
-        uint8_t acpientryparsed[19];
-        itohex(i,acpientryparsed);
-        putString(acpientryparsed,350,0,0x00FF0000,0xFF000000,1);
-        itohex(current,acpientryparsed);
-        putString(acpientryparsed,350,10,0x00FF0000,0xFF000000,1);
-        itohex(max,acpientryparsed);
-        putString(acpientryparsed,350,20,0x00FF0000,0xFF000000,1);
     }
     putString("init lapic\0",0,200,0xFFFFFFFF,0x000000FF,1);
     init_lapic(local_apic_config);

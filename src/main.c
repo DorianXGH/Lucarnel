@@ -2,6 +2,7 @@
 #include "includes/stivale.h"
 #include "includes/memory_structs.h"
 #include "video/video.h"
+#include "video/cons.h"
 #include "memory/gdt.h"
 #include "includes/x86_64_utils.h"
 #include "memory/paging.h"
@@ -41,10 +42,11 @@ int main(struct stivale_struct *stivale_info)
     // ------------------------------ //
 
     _lgdt(&gdtd);
-    putString("gdt\0",0,64,0x00FF00FF,0xFF000000,2);
+    print("gdt initialized\n");
 
     paging_init_identity();
-    putString("paging\0",0,128,0x00FF00FF,0xFF000000,2);
+    print("paging initialized\n");
+    print("512 first G identity mapped\n");
 
     stivale_global_info = *stivale_info;
 
@@ -53,7 +55,14 @@ int main(struct stivale_struct *stivale_info)
     // ----------------------- //
 
     init_IDT();
-    putString("idt\0",0,128+64,0x00FF00FF,0xFF000000,2);
+    print("idt initialized\n");
+
+    // ------------------------- //
+    // Physical Memory Allocator //
+    // ------------------------- //
+
+    //register_mmap((struct mmap_entry *) stivale_info->memory_map_addr,stivale_info->memory_map_entries);
+    //print("physical memory allocator initialized\n");
 
     // -------------------- //
     // Retrieving ACPI info //
@@ -61,7 +70,7 @@ int main(struct stivale_struct *stivale_info)
     
     init_kernel_acpi((struct RSDP2*)stivale_info->rsdp);
     
-    putString("parsed\0",300,0,0x00FF00FF,0xFF000000,2);
+    print("acpi tables parsed\n");
 
     init_system();
 }
@@ -69,9 +78,8 @@ int main(struct stivale_struct *stivale_info)
 int init_system()
 {
     procnum++;
-    putString("pric\0",200,128+64,0x00FF00FF,0xFF000000,2);
-    uint8_t procnumstr[19];
-    itohex(procnum,procnumstr);
-    putString(procnumstr,300,128+64,0x00FF00FF,0xFF000000,2);
+    //print("proc ");
+    print_num(procnum);
+    print("\n");
     while (1) {}
 }
