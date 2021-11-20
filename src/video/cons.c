@@ -18,8 +18,16 @@ void show()
 {
     for(uint64_t j = 0; j < current_term->h; j++) {
         uint8_t line_buffer[current_term->w+1];
+        bool clear = false;
         for(uint64_t i = 0; (i < current_term->w); i++) {
-            line_buffer[i] = current_term->buffer[current_term->w * j + i];
+            if(current_term->buffer[current_term->w * j + i])
+            {
+                line_buffer[i] = current_term->buffer[current_term->w * j + i];
+            } else {
+                clear = true;
+            }
+            if(clear)
+                line_buffer[i] = ' ';
         }
         line_buffer[current_term->w] = 0;
         putString(line_buffer,current_term->x,current_term->y + j*12*current_term->zoom,current_term->foreground,current_term->background,current_term->zoom);
