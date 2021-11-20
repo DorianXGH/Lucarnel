@@ -18,7 +18,7 @@ void show()
 {
     for(uint64_t j = 0; j < current_term->h; j++) {
         uint8_t line_buffer[current_term->w+1];
-        for(uint64_t i = 0; (i < current_term->w) && (line_buffer[i]); i++) {
+        for(uint64_t i = 0; (i < current_term->w); i++) {
             line_buffer[i] = current_term->buffer[current_term->w * j + i];
         }
         line_buffer[current_term->w] = 0;
@@ -31,6 +31,7 @@ void print(uint8_t * str)
     for(uint64_t i = 0; str[i]; i++) {
         if(str[i] == '\n')
         {
+            current_term->buffer[current_term->w*current_term->j+current_term->i] = 0;
             current_term->i = 0;
             current_term->j++;
             current_term->j%=current_term->h;
