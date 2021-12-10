@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include "video.h"
 #include "../includes/utils.h"
-#define DEFAULT_TERM_WIDTH 48
-#define DEFAULT_TERM_HEIGHT 32
+#define DEFAULT_TERM_WIDTH 80
+#define DEFAULT_TERM_HEIGHT 40
 
 struct terminal_handle {
     uint64_t x;
