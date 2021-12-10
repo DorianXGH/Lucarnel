@@ -201,7 +201,7 @@ void parse_madt()
         }
         current += entry->length;
     }
-    putString("init lapic\0",0,200,0xFFFFFFFF,0x000000FF,1);
+    
     init_lapic(local_apic_config);
-    putString("init lapic done\0",0,200,0xFFFFFFFF,0x000000FF,1);
+    print("\ninit lapic done\n\n");
 }
