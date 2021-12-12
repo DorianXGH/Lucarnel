@@ -21,7 +21,7 @@ void register_mmap(struct mmap_entry * base, uint64_t count)
 
 void regroup()
 {
-    sort_merge(0,MAX_ALLOC >> 1, MAX_ALLOC, compare_base);
+    sort_insert(0,MAX_ALLOC >> 1, MAX_ALLOC, compare_base);
     uint64_t i = 0;
 
     while(i < MAX_ALLOC - 1) {
@@ -42,46 +42,34 @@ void regroup()
     sort();
 }
 
-bool compare_len(uint64_t i, uint64_t j)
+bool compare_len(struct memory_block_seg * i, struct memory_block_seg * j)
 {
-    return segments[i].len < segments[j].len;
+    return i->len < j->len;
 }
 
-bool compare_base(uint64_t i, uint64_t j)
+bool compare_base(struct memory_block_seg * i, struct memory_block_seg * j)
 {
-    return segments[i].base > segments[j].base;
+    return i->base < j->base;
 }
 
-void sort_merge(uint64_t l, uint64_t r, uint64_t sz, bool(* comp)(uint64_t,uint64_t))
+
+void sort_insert(uint64_t l, uint64_t r, uint64_t sz, bool(* comp)(struct memory_block_seg *,struct memory_block_seg *))
 {
-    if (sz == 1) {
-        return;
-    }
-    uint64_t nsz = sz >> 1;
-    sort_merge(l, l + (nsz>>1), nsz, comp);
-    sort_merge(r, r + (nsz>>1), nsz, comp);
-    uint64_t lp = l;
-    uint64_t rp = r;
-    while(((lp-l) < sz) && ((rp-l) < sz))
+    for (uint64_t i = 1; i < sz; i++)
     {
-        if(comp(lp,rp)) {
-            struct memory_block_seg s = segments[rp];
-            for(uint64_t i = rp; i > lp; i--)
-            {
-                segments[i] = segments[i-1];
-            }
-            segments[lp] = s;
-            lp ++;
-            rp ++;
-        } else {
-            lp ++;
+        struct memory_block_seg key = segments[i];
+        uint64_t j;
+        for (j = i - 1; j >= 0 && comp(&(segments[j]),&key); j--)
+        {
+            segments[j + 1] = segments[j];
         }
+        segments[j + 1] = key;
     }
 }
 
 void sort()
 {
-    sort_merge(0,MAX_ALLOC >> 1, MAX_ALLOC, compare_len);
+    sort_insert(0,MAX_ALLOC >> 1, MAX_ALLOC, compare_len);
 }
 
 void * bitmap_allocator(uint64_t sec) {
@@ -89,27 +77,54 @@ void * bitmap_allocator(uint64_t sec) {
     uint64_t bitmap_size_pg = ((sec_size & 0xfff) == 0) ? sec_size >> 12 : (sec_size >> 12) + 1; // nombre de pages dans la section
     uint64_t bitmap_size_abs = ((bitmap_size_pg & 0x7) == 0) ? bitmap_size_pg >> 3 : (bitmap_size_pg >> 3) + 1; // taille de la bitmap en octets
     uint64_t bitmap_size = (bitmap_size_abs & 0xfff) ? (bitmap_size_abs & 0xfffffffffffff000) + 0x1000 : bitmap_size_abs; // taille de la bitmap en pages
-
+    /*print("\nbtm sz ");
+    print_num(bitmap_size_pg);
+    print(" pg ");
+    print_num(bitmap_size);
+    print("\nbtm ");*/
     uint64_t allocated = segments[sec].first_free;
-    uint64_t alloc_b_idx = (allocated-bitmap_size) >> 12;
-    uint64_t alloc_qw_idx = alloc_b_idx >> 6;
+    /*print_num(allocated);
+    print(" ");
+    print_num(segments[sec].base);
+    print("  ");*/
+    uint64_t alloc_b_idx = (allocated-bitmap_size-(segments[sec].base)) >> 12; // bit index
+    /*print_num(alloc_b_idx);
+    print(" ");*/
+    uint64_t alloc_qw_idx = alloc_b_idx >> 6; // 64bit uint index
+    /*print_num(alloc_qw_idx);
+    print(" ");*/
     uint64_t * bitmap = (uint64_t *) segments[sec].base;
-    bitmap[alloc_qw_idx] |= 1 << (alloc_b_idx & 0x3f);
+    bitmap[alloc_qw_idx] |= 1 << (alloc_b_idx & 0x3f); // mark page as allocated
 
     uint64_t nxt = alloc_qw_idx;
-    while((~(bitmap[nxt]) == 0)&&(nxt < (bitmap_size_abs >> 3)))
+    //print("\n find new free ");
+    while((~(bitmap[nxt]) == 0)&&(nxt < (bitmap_size_abs >> 3))) // try to find unallocated pages
     {
+        
+        /*print_num(bitmap[nxt]);
+        print(" ");*/
         nxt++;
     }
-    uint64_t k = __builtin_ffsll(~(bitmap[nxt]));
-    uint64_t free_p_num = ((nxt << 6) + k - 1);
-    if (k == 0 || (free_p_num >= bitmap_size_pg)) // todo fix unaligned
+    uint64_t k = __builtin_ffsll(~(bitmap[nxt])); // first bit to free page
+    uint64_t free_p_num = ((nxt << 6) + k - 1); // page numberé
+    /*print("\n res ");
+    print_num(k);
+    print(" ");
+    print_num(free_p_num);
+    print(" ");
+    print_num(bitmap_size_pg - (bitmap_size >> 12));
+    print("\n");*/
+    if (k == 0 || (free_p_num >= bitmap_size_pg - (bitmap_size >> 12))) // if the section is full
     {
-        segments[sec].full = 1;
+        segments[sec].full = 1; // mark it as such
+        //print("\n  set full  \n");
     }
     else
     {
-        segments[sec].first_free = free_p_num << 12;
+        segments[sec].first_free = bitmap_size + segments[sec].base + (free_p_num << 12);
+        /*print("\n  next  ");
+        print_num(segments[sec].first_free);
+        print("\n");*/
     }
     segments[sec].allocated_count++;
     return (void *) allocated;
@@ -127,13 +142,21 @@ void init_bitmap_allocator(uint64_t sec)
 
 void convert_to_bitmap_allocator(uint64_t sec)
 {
-    if(segments[sec].len > 0x2000)
+    uint64_t sec_size = segments[sec].len;
+    uint64_t bitmap_size_pg = ((sec_size & 0xfff) == 0) ? sec_size >> 12 : (sec_size >> 12) + 1; // nombre de pages dans la section
+    uint64_t bitmap_size_abs = ((bitmap_size_pg & 0x7) == 0) ? bitmap_size_pg >> 3 : (bitmap_size_pg >> 3) + 1; // taille de la bitmap en octets
+    uint64_t bitmap_size = (bitmap_size_abs & 0xfff) ? (bitmap_size_abs & 0xfffffffffffff000) + 0x1000 : bitmap_size_abs; // taille de la bitmap en pages x taille de page
+
+    if(segments[sec].len >= 0x2000)
     {
         segments[sec].allocated = 1;
         segments[sec].allocated_count = 0;
         segments[sec].bitmap_allocated = 1;
         segments[sec].full = 0;
+        segments[sec].first_free = segments[sec].base + bitmap_size;
+        // print("init bitmap ");
         init_bitmap_allocator(sec);
+        // print("done\n");
     }
 }
 
@@ -141,6 +164,9 @@ uint64_t find_new_bitmap_allocator()
 {
     for(uint64_t i = MAX_ALLOC-1; i >= 0; i--) {
         if((segments[i].len != 0) && !(segments[i].allocated)) {
+            /*print("converting ");
+            print_num(i);
+            print("\n");*/
             convert_to_bitmap_allocator(i);
             return i+1;
         }
@@ -158,7 +184,7 @@ void * bitmap_allocate()
     return 0;
 }
 
-void * pmalloc(uint64_t size) // worst fit
+void * pmalloc_constraint(uint64_t size, uint64_t max_add)
 {
     size = (size & 0xfff) ? (size & 0xfffffffffffff000) + 0x1000 : size; // page allocation
     size = (size) ? size : 0x1000;
@@ -176,7 +202,7 @@ void * pmalloc(uint64_t size) // worst fit
         }
     } else {  // use range allocator
         for(uint64_t i = 0; i < MAX_ALLOC; i++) {
-            if ((!(segments[i].allocated)) && (size <= segments[i].len)) {
+            if ((!(segments[i].allocated)) && (size <= segments[i].len) && ((segments[i].base + size - 1) <= max_add)) {
                 if ((segments[MAX_ALLOC-1].len == 0) && (size < segments[i].len)) {
                     segments[MAX_ALLOC-1].base = segments[i].base;
                     segments[MAX_ALLOC-1].len = size;
@@ -194,11 +220,70 @@ void * pmalloc(uint64_t size) // worst fit
     
     return 0;
 }
+
+void * pmalloc(uint64_t size) // worst fit
+{
+    pmalloc_constraint(size,-1);
+}
+
+void bitmap_free(uint64_t sec, void * ptr)
+{
+    uint64_t sec_size = segments[sec].len;
+    uint64_t bitmap_size_pg = ((sec_size & 0xfff) == 0) ? sec_size >> 12 : (sec_size >> 12) + 1; // nombre de pages dans la section
+    uint64_t bitmap_size_abs = ((bitmap_size_pg & 0x7) == 0) ? bitmap_size_pg >> 3 : (bitmap_size_pg >> 3) + 1; // taille de la bitmap en octets
+    uint64_t bitmap_size = (bitmap_size_abs & 0xfff) ? (bitmap_size_abs & 0xfffffffffffff000) + 0x1000 : bitmap_size_abs; // taille de la bitmap en pages x taille de page
+    uint64_t page = ((uint64_t)ptr-segments[sec].base-bitmap_size)>>12;
+    
+    uint64_t page_qw_idx = page >> 6; // 64bit uint index
+    uint64_t * bitmap = (uint64_t *) segments[sec].base;
+    bitmap[page_qw_idx] &= ~((uint64_t)(1 << (page & 0x3f))); // set to 0
+    if(segments[sec].full){
+        segments[sec].full = 0;
+        segments[sec].first_free = (((uint64_t) ptr) >> 12) << 12;
+    }
+    if ((uint64_t) ptr < segments[sec].first_free)
+    {
+        segments[sec].first_free = (((uint64_t) ptr) >> 12) << 12;
+    }
+}
+
 void free(void * ptr) 
 {
     for(uint64_t i = 0; i < MAX_ALLOC; i++) {
         if (segments[i].base == (uint64_t)ptr) {
             segments[i].allocated = false;
         }
+        if (segments[i].base <= (uint64_t)ptr && (uint64_t)ptr < segments[i].base+segments[i].len && segments[i].bitmap_allocated) {
+            bitmap_free(i,ptr);
+        }
     }
+}
+
+void show_map() {
+    print("\n");
+    for(uint64_t i = 0; i < MAX_ALLOC; i++) {
+        if (segments[i].len != 0) {
+            if(i%10 == 0)
+                print("\n");
+            print("base ");
+            print_num(segments[i].base);
+            print(" len ");
+            print_num(segments[i].len);
+            if(segments[i].allocated)
+            {
+                print(" allocated");
+            }
+            if(segments[i].bitmap_allocated)
+            {
+                print(" bitmap");
+            }
+            if(segments[i].full)
+            {
+                print(" full");
+            }
+            print("\n");
+            
+        }
+    }
+    print("\n");
 }

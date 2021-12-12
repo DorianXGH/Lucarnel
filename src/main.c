@@ -10,7 +10,7 @@
 #include "includes/utils.h"
 #include "includes/acpi.h"
 
-uint8_t kernel_stack[0x1000] __attribute__((section(".stack"),used)) = {0};
+uint8_t kernel_stack[0x4000] __attribute__((section(".stack"),used)) = {0};
 struct stivale_header stivalehd __attribute__((section(".stivalehdr"),used)) = {
     .stack = (uintptr_t)&kernel_stack + sizeof(kernel_stack) - 1,
     .flags = 0x0001
@@ -42,11 +42,11 @@ int main(struct stivale_struct *stivale_info)
     // ------------------------------ //
 
     _lgdt(&gdtd);
-    print("gdt initialized\n");
+    // print("gdt initialized\n");
 
     paging_init_identity();
-    print("paging initialized\n");
-    print("512 first G identity mapped\n");
+    //print("paging initialized\n");
+   // print("512 first G identity mapped\n");
 
     stivale_global_info = *stivale_info;
 
@@ -55,7 +55,7 @@ int main(struct stivale_struct *stivale_info)
     // ----------------------- //
 
     init_IDT();
-    print("idt initialized\n");
+    // print("idt initialized\n");
 
     // ------------------------- //
     // Physical Memory Allocator //
@@ -63,6 +63,7 @@ int main(struct stivale_struct *stivale_info)
 
     register_mmap((struct mmap_entry *) stivale_info->memory_map_addr,stivale_info->memory_map_entries);
     print("physical memory allocator initialized\n");
+    //while (1) {}
 
     // -------------------- //
     // Retrieving ACPI info //
@@ -81,5 +82,18 @@ int init_system()
     print("proc ");
     print_num(procnum);
     print("\n");
+    show_map();
+    uint64_t addr = 0;
+    for(uint8_t it = 0; it < 20; it++)
+    {
+        addr = (uint64_t) pmalloc(0x1000);
+        print("allocated addr ");
+        print_num(addr);
+        print("\n");
+        while(get_current_tick()%1000 != 0) {
+
+        }
+    }
+    //show_map(); 
     while (1) {}
 }
