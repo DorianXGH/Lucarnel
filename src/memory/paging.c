@@ -1,52 +1,39 @@
 #include "paging.h"
 
 struct PML4E pml4[512] __attribute__ ((aligned (4096)));
-struct PDPTE pdpt[512] __attribute__ ((aligned (4096)));
+struct PDPTE pdpt[512][512] __attribute__ ((aligned (4096)));
 
 void paging_init_identity()
 {
     for(int i = 0; i < 512; i++)
     {
-        pdpt[i] = (struct PDPTE){
-            1, // present
-            1, // Read/Write
-            1, // Supervisor
-            0, // write back
-            0, // enable cache
-            0, // accessed
-            0, // dirty ! only if big page
-            1, // 1G page
-            0, // nullbits
-            i << (30-12), // address (*1G) 
-            0, // reserved nullbits
-            0  // enables execution
-        };
-    }
-    pml4[0] = (struct PML4E){
-        1, // present
-        1, // read and write
-        1, // supervisor
-        0, // write back
-        0, // enable cache
-        0, // not accessed (CPU set)
-        0, // ignored
-        0, // nullbits
-        (uintptr_t)pdpt >> 12, // address of page
-        0, // nullbits
-        0  // allow execution
-    };
-    for(int i = 1; i < 512; i++)
-    {
+        for(int j = 0; j < 512; j++)
+        {
+            pdpt[i][j] = (struct PDPTE){
+                1, // present
+                1, // Read/Write
+                1, // Supervisor
+                0, // write back
+                1, // disable cache
+                0, // accessed
+                0, // dirty ! only if big page
+                1, // 1G page
+                0, // nullbits
+                (i*512 | j) << (30-12), // address (*1G) 
+                0, // reserved nullbits
+                0  // enables execution
+            };
+        }
         pml4[i] = (struct PML4E){
-            0, // NOT present
-            0, // read and write
-            0, // supervisor
+            1, // present
+            1, // read and write
+            1, // supervisor
             0, // write back
             0, // enable cache
             0, // not accessed (CPU set)
             0, // ignored
             0, // nullbits
-            0, // address of page
+            (uintptr_t)pdpt[i] >> 12, // address of page
             0, // nullbits
             0  // allow execution
         };
@@ -59,15 +46,15 @@ void paging_init_identity()
     _lcr3(&cr3);
 }
 
-void map(uint64_t vbase, uint64_t pbase, uint64_t size, bool cache_dis, bool code, bool supervisor)
+void map(struct context * ctx, uint64_t vbase, uint64_t pbase, uint64_t size, bool cache_dis, bool code, bool supervisor)
 {
     uint64_t i = 0;
     while ((i < size)) {
-        map_page(vbase + i, pbase + i, cache_dis, code, supervisor, PS_4K);
+        map_page(ctx, vbase + i, pbase + i, cache_dis, code, supervisor, PS_4K);
         i += 0x1000;
     }
 }
-void map_page(uint64_t vp, uint64_t pp, bool cache_dis, bool code, bool supervisor, enum PAGE_SIZE sz)
+void map_page(struct context * ctx, uint64_t vp, uint64_t pp, bool cache_dis, bool code, bool supervisor, enum PAGE_SIZE sz)
 {
     uint64_t pt_index = vp >> (12);
     uint64_t pd_index = vp >> (12+9);
