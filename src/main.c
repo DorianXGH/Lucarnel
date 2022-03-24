@@ -42,10 +42,11 @@ int main(struct stivale_struct *stivale_info)
     // ------------------------------ //
 
     _lgdt(&gdtd);
-    // print("gdt initialized\n");
+    print("gdt initialized\n");
 
     paging_init_identity();
-    //print("paging initialized\n");
+    
+    print("paging initialized\n");
    // print("512 first G identity mapped\n");
 
     stivale_global_info = *stivale_info;

@@ -49,3 +49,5 @@ struct pci_config_header_device {
 void init_pci_tree(struct MCFG* mcfg);
 
 struct pci_config_header_common * get_PCI_device_cfg_space(uint64_t PCI_config_base, uint8_t bus, uint8_t device, uint8_t function);
+
+void pci_device_callback(uint8_t class, uint8_t subclass, bool (*callback)(struct pci_config_header_common *));

@@ -1,12 +1,13 @@
-OUTPUT_FORMAT("elf64-x86-64")
+OUTPUT_FORMAT(elf64-x86-64)
+OUTPUT_ARCH(i386:x86-64)
 ENTRY(_entrypoint)
 PHDRS
 {
-  main PT_LOAD AT ( 0x00100000 );
+  main PT_LOAD;
 }
 SECTIONS
 {
-  . = 0x00100000;
+  . = 0xffffffff80200000;
   .stivalehdr : {
     *(.stivalehdr)
   } :main
@@ -37,16 +38,5 @@ _BSS_END_ = .;
 _STACK_START_ = .;
     *(.stack)
 _STACK_END_ = .;
-  } :main
-
-  . = 0x001EF000;
-  .smp_btstrp :  {
-_SMP_START_ = .;
-    *(.smp_btstrp)
-_SMP_END_ = .;
-  } :main
-  . = 0x001F0000;
-  .long_btstrp :  {
-    *(long_btstrp)
   } :main
 }

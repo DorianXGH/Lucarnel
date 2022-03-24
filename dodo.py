@@ -6,7 +6,7 @@ from doit.reporter import ConsoleReporter
 
 GCC_ASM_ARGS = "-masm=intel"
 GAS_ASM_ARGS = "-msyntax=intel -mnaked-reg"
-GCC_TARGET_ARGS = "-ffreestanding -mno-red-zone -std=c11 -Werror -fcompare-debug-second"
+GCC_TARGET_ARGS = "-ffreestanding -mno-red-zone -std=c11 -Werror -fcompare-debug-second -mcmodel=large"
 GCC_INTERRUPT_ARGS = "-mgeneral-regs-only"
 GCC_TOOLS_PREFIX = "/home/dorian/opt/cross/bin/" + "x86_64-elf-"
 
@@ -134,7 +134,7 @@ def task_link():
     deps = [generate_obj_path(src) for src in (
         c_sources + asm_sources + interrupts_sources)]
     return {
-        'file_dep': deps,
+        'file_dep': deps+["src/link.ld"],
         'targets': ["build/kernel.elf"],
         'actions': ['%sld -m elf_x86_64 -T src/link.ld %s -o %s' % (GCC_TOOLS_PREFIX, ' '.join(deps), "build/kernel.elf")],
         'clean': True,
