@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include "assert.h"
+#include "../tasks/regfile.h"
 
 struct IDTD {
     uint16_t size;
@@ -18,15 +19,6 @@ struct IDTE {
    uint32_t zero;     // reserved
 } __attribute__((packed));
 STATIC_ASSERT(sizeof(struct IDTE) == 16, wrong_IDTE_size);
-
-struct IFrame {
-    uint64_t SS;
-    uint64_t RSP;
-    uint64_t RFLAGS;
-    uint64_t CS;
-    uint64_t RIP;
-} __attribute__((packed));
-STATIC_ASSERT(sizeof(struct IFrame) == 40, wrong_interrupt_frame_size);
 
 __attribute__((interrupt)) void ISR_general_handler(struct IFrame* interrupt_frame);
 __attribute__((interrupt)) void ISR_error_handler(struct IFrame* interrupt_frame, uint64_t error_code);
@@ -49,7 +41,8 @@ __attribute__((interrupt)) void ISR_page_fault_handler(struct IFrame* interrupt_
 __attribute__((interrupt)) void ISR_spurious(struct IFrame* interrupt_frame);
 
 //__attribute__((interrupt)) void IRQ_timer(struct IFrame* interrupt_frame);
-__attribute__((naked)) void IRQ_timer();
+extern void IRQ_timer_stub();
+void IRQ_timer(struct regfile *);
 void init_IDT();
 
 uint64_t get_current_tick();

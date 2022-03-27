@@ -18,6 +18,10 @@ struct stivale_header stivalehd __attribute__((section(".stivalehdr"),used)) = {
 
 struct stivale_struct stivale_global_info;
 uint32_t procnum = 0;
+extern volatile struct regfile next_task;
+
+uint8_t init_task_stack[0x4000] = {0};
+
 int init_system();
 
 int main(struct stivale_struct *stivale_info)
@@ -74,11 +78,35 @@ int main(struct stivale_struct *stivale_info)
     
     print("acpi tables parsed\n");
 
-    init_system();
+    //init_system();
+    next_task.rax = 0;
+    next_task.rbx = 0;
+    next_task.rcx = 0;
+    next_task.rdx = 0;
+
+    next_task.rdi = 0;
+    next_task.rsi = 0;
+
+    next_task.r8 = 0;
+    next_task.r9 = 0;
+    next_task.r10 = 0;
+    next_task.r11 = 0;
+    next_task.r12 = 0;
+    next_task.r13 = 0;
+    next_task.r14 = 0;
+    next_task.r15 = 0;
+
+    next_task.frame.RIP = (uintptr_t)init_system;
+    next_task.frame.RSP = (uintptr_t)(init_task_stack + sizeof(init_task_stack));
+    next_task.rbp = (uintptr_t)(init_task_stack + sizeof(init_task_stack));
+
+    next_task.error = 1;
+    while (1) {}
 }
 
 int init_system()
 {
+    next_task.error = 0;
     procnum++;
     print("proc ");
     print_num(procnum);

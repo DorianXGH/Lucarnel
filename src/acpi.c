@@ -106,7 +106,7 @@ void init_kernel_acpi(struct RSDP2* rsdp)
     }
     if(mcfg != 0)
     {
-        init_pci_tree((struct MCFG*)mcfg);
+        //init_pci_tree((struct MCFG*)mcfg);
     }
 }
 

@@ -6,7 +6,7 @@ from doit.reporter import ConsoleReporter
 
 GCC_ASM_ARGS = "-masm=intel"
 GAS_ASM_ARGS = "-msyntax=intel -mnaked-reg"
-GCC_TARGET_ARGS = "-ffreestanding -mno-red-zone -std=c11 -Werror -fcompare-debug-second -mcmodel=large"
+GCC_TARGET_ARGS = "-ffreestanding -mno-red-zone -std=c11 -Werror -fcompare-debug-second -mcmodel=large -ggdb"
 GCC_INTERRUPT_ARGS = "-mgeneral-regs-only"
 GCC_TOOLS_PREFIX = "/home/dorian/opt/cross/bin/" + "x86_64-elf-"
 
@@ -29,7 +29,8 @@ interrupts_sources = [
 
 asm_sources = [
     "src/entry.S",
-    "src/x86_64_utils.S"
+    "src/x86_64_utils.S",
+    "src/interrupts/IRQ.S"
 ]
 
 
