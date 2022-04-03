@@ -9,6 +9,8 @@
 #include "includes/interrupts.h"
 #include "includes/utils.h"
 #include "includes/acpi.h"
+#include "tasks/context.h"
+#include "tasks/tss.h"
 
 uint8_t kernel_stack[0x4000] __attribute__((section(".stack"),used)) = {0};
 struct stivale_header stivalehd __attribute__((section(".stivalehdr"),used)) = {
@@ -18,7 +20,8 @@ struct stivale_header stivalehd __attribute__((section(".stivalehdr"),used)) = {
 
 struct stivale_struct stivale_global_info;
 uint32_t procnum = 0;
-extern volatile struct regfile next_task;
+extern volatile struct context next_task;
+extern struct CR3 cr;
 
 uint8_t init_task_stack[0x4000] = {0};
 
@@ -26,6 +29,7 @@ int init_system();
 
 int main(struct stivale_struct *stivale_info)
 {
+    uint64_t * crview = (uint64_t *)(&cr);
     // --------------------------- //
     // Initializing Video feedback //
     // --------------------------- //
@@ -44,7 +48,8 @@ int main(struct stivale_struct *stivale_info)
     // ------------------------------ //
     // Initializing Memory Protection //
     // ------------------------------ //
-
+    install_TSS();
+    print("tss installed\n");
     _lgdt(&gdtd);
     print("gdt initialized\n");
 
@@ -52,7 +57,9 @@ int main(struct stivale_struct *stivale_info)
     
     print("paging initialized\n");
    // print("512 first G identity mapped\n");
-
+    print("cr3 ");
+    print_num(*crview);
+    print("\n");
     stivale_global_info = *stivale_info;
 
     // ----------------------- //
@@ -60,6 +67,9 @@ int main(struct stivale_struct *stivale_info)
     // ----------------------- //
 
     init_IDT();
+    print("cr3 ");
+    print_num(*crview);
+    print("\n");
     // print("idt initialized\n");
 
     // ------------------------- //
@@ -69,6 +79,9 @@ int main(struct stivale_struct *stivale_info)
     register_mmap((struct mmap_entry *) stivale_info->memory_map_addr,stivale_info->memory_map_entries);
     print("physical memory allocator initialized\n");
     //while (1) {}
+    print("cr3 ");
+    print_num(*crview);
+    print("\n");
 
     // -------------------- //
     // Retrieving ACPI info //
@@ -79,34 +92,40 @@ int main(struct stivale_struct *stivale_info)
     print("acpi tables parsed\n");
 
     //init_system();
-    next_task.rax = 0;
-    next_task.rbx = 0;
-    next_task.rcx = 0;
-    next_task.rdx = 0;
+    next_task.regs.rax = 0;
+    next_task.regs.rbx = 0;
+    next_task.regs.rcx = 0;
+    next_task.regs.rdx = 0;
 
-    next_task.rdi = 0;
-    next_task.rsi = 0;
+    next_task.regs.rdi = 0;
+    next_task.regs.rsi = 0;
 
-    next_task.r8 = 0;
-    next_task.r9 = 0;
-    next_task.r10 = 0;
-    next_task.r11 = 0;
-    next_task.r12 = 0;
-    next_task.r13 = 0;
-    next_task.r14 = 0;
-    next_task.r15 = 0;
+    next_task.regs.r8 = 0;
+    next_task.regs.r9 = 0;
+    next_task.regs.r10 = 0;
+    next_task.regs.r11 = 0;
+    next_task.regs.r12 = 0;
+    next_task.regs.r13 = 0;
+    next_task.regs.r14 = 0;
+    next_task.regs.r15 = 0;
 
-    next_task.frame.RIP = (uintptr_t)init_system;
-    next_task.frame.RSP = (uintptr_t)(init_task_stack + sizeof(init_task_stack));
-    next_task.rbp = (uintptr_t)(init_task_stack + sizeof(init_task_stack));
+    next_task.regs.frame.RIP = (uintptr_t)init_system;
+    next_task.regs.frame.RSP = (uintptr_t)(init_task_stack + sizeof(init_task_stack));
+    next_task.regs.rbp = (uintptr_t)(init_task_stack + sizeof(init_task_stack));
+    next_task.regs.frame.CS = 0x18;
+    next_task.regs.frame.SS = 0x20;
+    next_task.cr = cr;
+    print("cr3 ");
+    print_num(*crview);
+    print("\n");
 
-    next_task.error = 1;
+    next_task.regs.error = 1;
     while (1) {}
 }
 
 int init_system()
 {
-    next_task.error = 0;
+    next_task.regs.error = 0;
     procnum++;
     print("proc ");
     print_num(procnum);

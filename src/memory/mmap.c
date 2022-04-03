@@ -6,7 +6,7 @@ struct memory_block_seg segments[MAX_ALLOC];
 void register_mmap(struct mmap_entry * base, uint64_t count)
 {
     uint64_t k = 0;
-    for(uint64_t i = 0; i < count; i++)
+    for(uint64_t i = 0; i < count && k<MAX_ALLOC; i++)
     {
         if(base[i].type == 1)
         {
@@ -58,7 +58,7 @@ void sort_insert(uint64_t l, uint64_t r, uint64_t sz, bool(* comp)(struct memory
     for (uint64_t i = 1; i < sz; i++)
     {
         struct memory_block_seg key = segments[i];
-        uint64_t j;
+        int64_t j;
         for (j = i - 1; j >= 0 && comp(&(segments[j]),&key); j--)
         {
             segments[j + 1] = segments[j];

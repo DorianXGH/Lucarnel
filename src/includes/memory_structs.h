@@ -53,7 +53,7 @@ struct CR3 {
     uint16_t PCID: 12;
     uint64_t address: 42;
     uint16_t nullbits: 10;
-} __attribute__((packed)) ;
+} __attribute__((packed,aligned(8))) ;
 STATIC_ASSERT(sizeof(struct CR3) == 8, wrong_CR3_size);
 
 struct PML4E {

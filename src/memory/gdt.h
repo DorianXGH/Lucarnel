@@ -1,5 +1,6 @@
 #pragma once
 #include "../includes/memory_structs.h"
+#include "../tasks/tss.h"
 
 struct GDTE gdt[] = {
     { // null segment
@@ -133,23 +134,4 @@ struct GDTE gdt[] = {
 struct GDTD gdtd = {
     sizeof(gdt)-1,
     (uintptr_t)gdt
-};
-
-struct GDTE_TSS gdte_tss = {
-        0xFFFF, // limit 1
-        0, // base 1
-        0, // base 2
-        1, // accessed
-        0, // read_write busy bit
-        0, // direction conforming
-        1, // code
-        0, // descriptor
-        3, // ring
-        1, // present
-        0xF, // limit2
-        0, // nullbits
-        0, // limit using pages
-        0, // base 3
-        0, // base 4
-        0  // reserved
 };

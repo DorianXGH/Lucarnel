@@ -5,6 +5,7 @@
 #include "../includes/x86_64_utils.h"
 #include "../tasks/context.h"
 #include "mmap.h"
+#include "../video/cons.h"
 
 void paging_init_identity();
 void map(struct context * ctx, uint64_t vbase, uint64_t pbase, uint64_t size, bool cache_dis, bool code, bool supervisor);

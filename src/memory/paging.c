@@ -3,6 +3,8 @@
 struct PML4E pml4[512] __attribute__((aligned(4096)));
 struct PDPTE pdpt[512][512] __attribute__((aligned(4096)));
 
+struct CR3 cr;
+
 void paging_init_identity()
 {
     for (int i = 0; i < 512; i++)
@@ -66,12 +68,19 @@ void paging_init_identity()
         0,                            // reserved nullbits
         0                             // enables execution
     };
-    struct CR3 cr3 = {
+    cr = (struct CR3){
         0, // PCID or flags
         ((uintptr_t)pml4 & 0x7fffffff) >> 12,
         0 // nullbits
     };
-    _lcr3(&cr3);
+    print("cr3 ");
+    uint64_t * crview = (uint64_t *)(&cr);
+    print_num(*crview);
+    print("\n");
+    _lcr3(&cr);
+    print("cr3 ");
+    print_num(*crview);
+    print("\n");
 }
 
 void map(struct context *ctx, uint64_t vbase, uint64_t pbase, uint64_t size, bool cache_dis, bool code, bool supervisor)
