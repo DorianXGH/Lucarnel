@@ -112,8 +112,8 @@ int main(struct stivale_struct *stivale_info)
     next_task.regs.frame.RIP = (uintptr_t)init_system;
     next_task.regs.frame.RSP = (uintptr_t)(init_task_stack + sizeof(init_task_stack));
     next_task.regs.rbp = (uintptr_t)(init_task_stack + sizeof(init_task_stack));
-    next_task.regs.frame.CS = 0x18;
-    next_task.regs.frame.SS = 0x20;
+    next_task.regs.frame.CS = 0x18 | 0x3;
+    next_task.regs.frame.SS = 0x20 | 0x3;
     next_task.cr = cr;
     print("cr3 ");
     print_num(*crview);

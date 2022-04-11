@@ -1,6 +1,8 @@
 #include "../includes/interrupts.h"
 #include "../includes/stivale.h"
 #include "../video/video.h"
+//#include "../video/cons.h"
+#include "../includes/utils.h"
 
 __attribute__((interrupt)) void ISR_general_handler(struct IFrame* interrupt_frame) {
     putString("isr",0,0,0xFFFFFFFF,0xFFFF0000,1);
@@ -63,6 +65,9 @@ __attribute__((interrupt)) void ISR_stack_segment_fault_handler(struct IFrame* i
 
 __attribute__((interrupt)) void ISR_general_protection_fault_handler(struct IFrame* interrupt_frame, uint64_t error_code) {
     putString("genprotecfault",0,0,0xFFFFFFFF,0xFFFF0000,1);
+    uint8_t buf[20];
+    itohex(error_code,buf);
+    putString(buf,0,40,0xFFFFFFFF,0xFFFF0000,1);
 }
 
 __attribute__((interrupt)) void ISR_page_fault_handler(struct IFrame* interrupt_frame, uint64_t error_code) {
